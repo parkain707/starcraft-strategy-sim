@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarCraft Strategy Simulation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a1a; color: #fff; overflow: hidden; user-select: none; }
+        #gameCanvas { position: absolute; top: 0; left: 0; cursor: crosshair; }
+        #ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+
+        .resource-bar {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 30px; background: rgba(0,0,0,0.9); padding: 12px 30px;
+            border-radius: 10px; border: 2px solid #00d4ff; pointer-events: auto;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .resource-item { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: bold; }
+
+        .control-panel {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px; background: rgba(0,0,0,0.9); padding: 12px 15px;
+            border-radius: 12px; border: 2px solid #00d4ff; pointer-events: auto;
+            flex-wrap: wrap; justify-content: center; max-width: 700px;
+        }
+        .unit-btn {
+            width: 62px; height: 72px; background: linear-gradient(135deg, #2d3748, #1a202c);
+            border: 2px solid #4a5568; border-radius: 8px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.2s; color: #fff; font-size: 10px; position: relative;
+        }
+        .unit-btn:hover { border-color: #00d4ff; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,212,255,0.3); }
+        .unit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .unit-btn svg { width: 30px; height: 30px; }
+        .unit-btn img.unit-portrait { width: 38px; height: 38px; object-fit: cover; border-radius: 4px; image-rendering: auto; }
+        .cost { font-size: 9px; color: #ffd700; margin-top: 1px; }
+        .hotkey { position: absolute; top: 2px; right: 4px; font-size: 8px; color: #888; }
+        .queue-badge {
+            position: absolute; top: 2px; left: 4px; background: #ff6600; color: #fff;
+            font-size: 9px; font-weight: bold; border-radius: 50%; width: 16px; height: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .unit-info {
+            position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.9);
+            padding: 15px; border-radius: 10px; border: 2px solid #00d4ff; min-width: 220px;
+            pointer-events: auto;
+        }
+        .unit-info-header { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+        .unit-info-stats { font-size: 11px; color: #aaa; margin-top: 4px; }
+        .health-bar { width: 100%; height: 8px; background: #333; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+        .health-fill { height: 100%; transition: width 0.2s; border-radius: 4px; }
+        .shield-bar { width: 100%; height: 5px; background: #333; border-radius: 4px; margin-top: 3px; overflow: hidden; }
+        .shield-fill { height: 100%; background: linear-gradient(90deg, #00aaff, #00ddff); border-radius: 4px; }
+
+        .minimap-container {
+            position: absolute; bottom: 10px; right: 10px; pointer-events: auto;
+        }
+        .minimap {
+            width: 200px; height: 150px;
+            background: rgba(0,0,0,0.9); border: 2px solid #00d4ff; border-radius: 8px;
+            overflow: hidden; cursor: pointer;
+        }
+        .minimap canvas { width: 100%; height: 100%; }
+
+        .production-bar {
+            position: absolute; top: 55px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px; background: rgba(0,0,0,0.8); padding: 8px 15px;
+            border-radius: 8px; border: 1px solid #444; pointer-events: auto;
+        }
+        .prod-item {
+            width: 36px; height: 36px; background: #222; border: 1px solid #555; border-radius: 6px;
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .prod-item .prog-fill {
+            position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,212,255,0.3);
+            transition: height 0.1s;
+        }
+        .prod-item svg { width: 24px; height: 24px; position: relative; z-index: 1; }
+
+        .wave-indicator {
+            position: absolute; top: 10px; right: 220px; background: rgba(0,0,0,0.9);
+            padding: 8px 16px; border-radius: 8px; border: 2px solid #ff4444;
+            font-size: 14px; font-weight: bold; pointer-events: none;
+        }
+
+        .group-indicators {
+            position: absolute; top: 55px; right: 10px;
+            display: flex; gap: 4px; pointer-events: auto;
+        }
+        .group-btn {
+            width: 28px; height: 24px; background: rgba(0,0,0,0.7); border: 1px solid #555;
+            border-radius: 4px; color: #888; font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .group-btn.active { border-color: #00d4ff; color: #00d4ff; }
+
+        #startScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a1a 100%); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+        }
+        #startScreen h1 {
+            font-size: 3em; margin-bottom: 10px;
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .controls-help {
+            background: rgba(255,255,255,0.1); padding: 20px 40px; border-radius: 12px;
+            margin: 20px 0; font-size: 15px; line-height: 2; max-width: 650px; text-align: left;
+        }
+        .controls-help h3 { color: #00d4ff; margin-bottom: 15px; font-size: 20px; text-align: center; }
+        .controls-help p { margin: 4px 0; }
+        .key { background: #333; padding: 3px 10px; border-radius: 4px; font-family: monospace; color: #ffd700; }
+        .start-btn {
+            padding: 20px 60px; font-size: 1.5em; font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none; border-radius: 50px; color: white; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .start-btn:hover { transform: scale(1.1); box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5); }
+
+        #gameOverScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #gameOverScreen h1 { font-size: 3em; margin-bottom: 20px; }
+        #gameOverScreen .stats { font-size: 18px; margin: 10px 0; color: #aaa; }
+        .restart-btn {
+            margin-top: 30px; padding: 15px 50px; font-size: 1.2em; font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2); border: none;
+            border-radius: 50px; color: white; cursor: pointer; transition: all 0.3s;
+        }
+        .restart-btn:hover { transform: scale(1.1); }
+
+        #gameMessage {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,0,0,0.9); color: #fff; padding: 12px 30px; border-radius: 8px;
+            font-size: 16px; font-weight: bold; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none; z-index: 200;
+        }
+    </style>
+</head>
+<body>
+    <div id="startScreen">
+        <h1>StarCraft Strategy Sim</h1>
+        <p style="color:#aaa; font-size:14px; margin-bottom: 10px;">v2.0 - Full Gameplay Edition</p>
+        <div class="controls-help">
+            <h3>조작 방법</h3>
+            <p><span class="key">좌클릭 드래그</span> 유닛 선택 (다중 선택)</p>
+            <p><span class="key">우클릭</span> 이동 / 공격 / 미네랄 채굴</p>
+            <p><span class="key">A + 좌클릭</span> 어택 무브 (이동하며 적 공격)</p>
+            <p><span class="key">S</span> 정지 (선택 유닛 멈춤)</p>
+            <p><span class="key">H</span> 홀드 (이동 없이 제자리 공격)</p>
+            <p><span class="key">Ctrl+1~5</span> 부대 지정 / <span class="key">1~5</span> 부대 선택</p>
+            <p><span class="key">화면 가장자리 / 화살표키</span> 카메라 이동</p>
+            <p><span class="key">Space</span> 넥서스로 카메라 이동</p>
+            <p><span class="key">Q~Y</span> 유닛 생산 단축키</p>
+            <p style="margin-top:12px; color:#88ccff;">프로브로 미네랄을 채굴하고, 군대를 모아 적 해처리를 파괴하세요!</p>
+        </div>
+        <button class="start-btn" onclick="startGame()">게임 시작</button>
+    </div>
+
+    <div id="gameOverScreen">
+        <h1 id="gameOverTitle"></h1>
+        <div class="stats" id="gameOverStats"></div>
+        <button class="restart-btn" onclick="location.reload()">다시 시작</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+        <div id="gameMessage"></div>
+        <div class="resource-bar">
+            <div class="resource-item">
+                <svg width="20" height="20" viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="#00d4ff" stroke="#0099cc" stroke-width="2"/></svg>
+                <span id="mineralCount">200</span>
+            </div>
+            <div class="resource-item">
+                <span style="font-size:18px; color: #88ff88;">&#9650;</span>
+                <span id="supplyCount">0/10</span>
+            </div>
+            <div class="resource-item">
+                <span style="font-size:14px; color: #ff8888;">WAVE</span>
+                <span id="waveCount">1</span>
+            </div>
+            <div class="resource-item" style="font-size: 12px; color: #aaa;">
+                <span id="killCount">0 kills</span>
+            </div>
+        </div>
+
+        <div class="production-bar" id="productionBar" style="display:none;"></div>
+
+        <div class="group-indicators">
+            <div class="group-btn" id="grp1" onclick="selectGroup(1)">1</div>
+            <div class="group-btn" id="grp2" onclick="selectGroup(2)">2</div>
+            <div class="group-btn" id="grp3" onclick="selectGroup(3)">3</div>
+            <div class="group-btn" id="grp4" onclick="selectGroup(4)">4</div>
+            <div class="group-btn" id="grp5" onclick="selectGroup(5)">5</div>
+        </div>
+
+        <div class="unit-info" id="unitInfo" style="display: none;">
+            <div style="display:flex;gap:10px;align-items:center;">
+                <img id="selectedUnitPortrait" src="" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:2px solid #00d4ff;display:none;">
+                <div style="flex:1;">
+                    <div class="unit-info-header" id="selectedUnitName">유닛 정보</div>
+                    <div class="health-bar"><div class="health-fill" id="selectedUnitHealth" style="width:100%;background:linear-gradient(90deg,#44ff44,#88ff88);"></div></div>
+                    <div class="shield-bar" id="shieldBarContainer" style="display:none;"><div class="shield-fill" id="selectedUnitShield" style="width:100%;"></div></div>
+                </div>
+            </div>
+            <div class="unit-info-stats" id="selectedUnitStats"></div>
+        </div>
+
+        <div class="control-panel">
+            <button class="unit-btn" id="btnProbe" onclick="queueUnit('probe')">
+                <span class="hotkey">Q</span>
+                <img class="unit-portrait" src="sprites/probe.jpg" alt="프로브">
+                <span class="cost">50</span>
+                <span>프로브</span>
+            </button>
+            <button class="unit-btn" id="btnZealot" onclick="queueUnit('zealot')">
+                <span class="hotkey">W</span>
+                <img class="unit-portrait" src="sprites/zealot.jpg" alt="질럿">
+                <span class="cost">100</span>
+                <span>질럿</span>
+            </button>
+            <button class="unit-btn" id="btnDragoon" onclick="queueUnit('dragoon')">
+                <span class="hotkey">E</span>
+                <img class="unit-portrait" src="sprites/dragoon.jpg" alt="드라곤">
+                <span class="cost">125</span>
+                <span>드라곤</span>
+            </button>
+            <button class="unit-btn" id="btnArchon" onclick="queueUnit('archon')">
+                <span class="hotkey">R</span>
+                <img class="unit-portrait" src="sprites/archon.jpg" alt="아콘">
+                <span class="cost">300</span>
+                <span>아콘</span>
+            </button>
+            <button class="unit-btn" id="btnDarkTemplar" onclick="queueUnit('darkTemplar')">
+                <span class="hotkey">T</span>
+                <img class="unit-portrait" src="sprites/darktemplar.jpg" alt="다크템플러">
+                <span class="cost">200</span>
+                <span>다크템플러</span>
+            </button>
+            <button class="unit-btn" id="btnCarrier" onclick="queueUnit('carrier')">
+                <span class="hotkey">Y</span>
+                <img class="unit-portrait" src="sprites/carrier.jpg" alt="캐리어">
+                <span class="cost">350</span>
+                <span>캐리어</span>
+            </button>
+            <button class="unit-btn" id="btnPylon" onclick="buildPylon()" style="border-color:#00cc66;">
+                <span class="hotkey">P</span>
+                <img class="unit-portrait" src="sprites/pylon.jpg" alt="파일런">
+                <span class="cost">100</span>
+                <span>파일런</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="minimap-container">
+        <div class="minimap"><canvas id="minimapCanvas" width="200" height="150"></canvas></div>
+    </div>
+
+    <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const minimapCanvas = document.getElementById('minimapCanvas');
+    const minimapCtx = minimapCanvas.getContext('2d');
+
+    // === CONSTANTS ===
+    const MAP_W = 4000, MAP_H = 3000;
+    const SCROLL_SPEED = 12, EDGE_SCROLL_ZONE = 40;
+
+    // === AUDIO SYSTEM (Web Audio API - no external files) ===
+    let audioCtx = null;
+    let masterGain = null;
+    let musicGain = null;
+    let sfxGain = null;
+    let musicPlaying = false;
+
+    function initAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.5;
+        masterGain.connect(audioCtx.destination);
+        musicGain = audioCtx.createGain();
+        musicGain.gain.value = 0.18;
+        musicGain.connect(masterGain);
+        sfxGain = audioCtx.createGain();
+        sfxGain.gain.value = 0.6;
+        sfxGain.connect(masterGain);
+    }
+
+    // --- Sound Effects ---
+    function playTone(freq, duration, type, gainVal, dest) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gainVal || 0.3, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(g);
+        g.connect(dest || sfxGain);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playNoise(duration, gainVal, filterFreq) {
+        if (!audioCtx) return;
+        const bufferSize = audioCtx.sampleRate * duration;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const src = audioCtx.createBufferSource();
+        src.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = filterFreq || 2000;
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(gainVal || 0.2, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        src.connect(filter);
+        filter.connect(g);
+        g.connect(sfxGain);
+        src.start();
+        src.stop(audioCtx.currentTime + duration);
+    }
+
+    const SFX = {
+        select() {
+            playTone(800, 0.08, 'sine', 0.15);
+            playTone(1200, 0.06, 'sine', 0.1);
+        },
+        move() {
+            playTone(400, 0.1, 'triangle', 0.1);
+            playTone(500, 0.08, 'triangle', 0.08);
+        },
+        attackMelee() {
+            // Psi blade slash
+            playNoise(0.12, 0.25, 3000);
+            playTone(300, 0.15, 'sawtooth', 0.12);
+        },
+        attackRanged() {
+            // Laser/phase disruptor
+            playTone(1800, 0.08, 'square', 0.1);
+            playTone(1200, 0.12, 'sine', 0.08);
+        },
+        attackZerg() {
+            // Zerg attack
+            playTone(150, 0.15, 'sawtooth', 0.15);
+            playNoise(0.1, 0.12, 1500);
+        },
+        explosion() {
+            playNoise(0.4, 0.35, 800);
+            playTone(80, 0.3, 'sine', 0.2);
+            playTone(50, 0.5, 'sine', 0.15);
+        },
+        smallExplosion() {
+            playNoise(0.2, 0.2, 1200);
+            playTone(120, 0.15, 'sine', 0.1);
+        },
+        harvest() {
+            playTone(600, 0.1, 'sine', 0.08);
+            setTimeout(() => playTone(800, 0.1, 'sine', 0.06), 100);
+        },
+        mineralReturn() {
+            playTone(1000, 0.08, 'sine', 0.1);
+            playTone(1400, 0.08, 'sine', 0.08);
+            setTimeout(() => playTone(1800, 0.06, 'sine', 0.06), 80);
+        },
+        buildComplete() {
+            playTone(523, 0.15, 'sine', 0.15);
+            setTimeout(() => playTone(659, 0.15, 'sine', 0.12), 150);
+            setTimeout(() => playTone(784, 0.2, 'sine', 0.1), 300);
+        },
+        pylonBuilt() {
+            playTone(400, 0.2, 'triangle', 0.1);
+            playTone(600, 0.2, 'triangle', 0.08);
+            setTimeout(() => playTone(800, 0.3, 'triangle', 0.06), 200);
+        },
+        waveWarning() {
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    playTone(440, 0.2, 'square', 0.2);
+                    playTone(220, 0.3, 'sawtooth', 0.15);
+                }, i * 300);
+            }
+        },
+        error() {
+            playTone(200, 0.2, 'square', 0.15);
+        },
+        victory() {
+            const notes = [523, 659, 784, 1047];
+            notes.forEach((n, i) => setTimeout(() => playTone(n, 0.4, 'sine', 0.15), i * 200));
+        },
+        defeat() {
+            const notes = [400, 350, 300, 200];
+            notes.forEach((n, i) => setTimeout(() => playTone(n, 0.5, 'sawtooth', 0.12), i * 300));
+        }
+    };
+
+    // --- Background Music (procedural ambient) ---
+    let musicOscillators = [];
+    function startMusic() {
+        if (!audioCtx || musicPlaying) return;
+        musicPlaying = true;
+
+        // Ambient pad - low drone
+        function createPad(freq, type) {
+            const osc = audioCtx.createOscillator();
+            osc.type = type;
+            osc.frequency.value = freq;
+            const g = audioCtx.createGain();
+            g.gain.value = 0.08;
+            osc.connect(g);
+            g.connect(musicGain);
+            osc.start();
+            musicOscillators.push({ osc, gain: g });
+            return { osc, gain: g };
+        }
+
+        createPad(55, 'sine');      // Sub bass
+        createPad(110, 'triangle'); // Bass
+        createPad(165, 'sine');     // Fifth
+
+        // Melody arpeggiator
+        const melodyNotes = [
+            220, 261, 330, 392, 440, 392, 330, 261,  // Am arpeggio
+            220, 293, 349, 440, 523, 440, 349, 293,  // Dm feel
+            196, 247, 294, 392, 494, 392, 294, 247,  // G minor feel
+            165, 220, 330, 440, 523, 440, 330, 220   // E minor feel
+        ];
+        let melodyIdx = 0;
+
+        function playMelodyNote() {
+            if (!musicPlaying || !audioCtx) return;
+            const freq = melodyNotes[melodyIdx % melodyNotes.length];
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+            osc.connect(g);
+            g.connect(musicGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2);
+            melodyIdx++;
+            setTimeout(playMelodyNote, 1500 + Math.random() * 500);
+        }
+        setTimeout(playMelodyNote, 2000);
+
+        // Percussion pattern
+        function playDrum() {
+            if (!musicPlaying || !audioCtx) return;
+            // Kick
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.2);
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+            osc.connect(g); g.connect(musicGain);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+
+            // Hi-hat on offbeats
+            setTimeout(() => {
+                if (!musicPlaying) return;
+                playNoise(0.05, 0.04, 8000);
+            }, 400);
+
+            setTimeout(playDrum, 800);
+        }
+        setTimeout(playDrum, 3000);
+    }
+
+    function stopMusic() {
+        musicPlaying = false;
+        musicOscillators.forEach(m => { try { m.osc.stop(); } catch(e){} });
+        musicOscillators = [];
+    }
+
+    // === SPRITE IMAGES ===
+    const spriteImages = {};
+    const spriteList = {
+        probe: 'sprites/probe.jpg', zealot: 'sprites/zealot.jpg',
+        dragoon: 'sprites/dragoon.jpg', archon: 'sprites/archon.jpg',
+        darkTemplar: 'sprites/darktemplar.jpg', carrier: 'sprites/carrier.jpg',
+        zergling: 'sprites/zergling.jpg', hydralisk: 'sprites/hydralisk.jpg',
+        mutalisk: 'sprites/mutalisk.jpg', ultralisk: 'sprites/ultralisk.jpg',
+        guardian: 'sprites/guardian.jpg',
+        nexus: 'sprites/nexus.jpg', hatchery: 'sprites/hatchery.jpg',
+        pylon: 'sprites/pylon.jpg'
+    };
+    let spritesLoaded = 0, spritesTotal = Object.keys(spriteList).length;
+    for (const [key, src] of Object.entries(spriteList)) {
+        const img = new Image();
+        img.onload = () => { spritesLoaded++; };
+        img.src = src;
+        spriteImages[key] = img;
+    }
+
+    // === GAME STATE ===
+    const game = {
+        minerals: 200,
+        supply: { used: 0, max: 10 },
+        units: [], buildings: [], mineralsOnMap: [],
+        selectedUnits: [], projectiles: [], particles: [],
+        mouse: { x: 0, y: 0, worldX: 0, worldY: 0, down: false },
+        selectionStart: { x: 0, y: 0 }, isSelecting: false,
+        camera: { x: 0, y: 0 },
+        lastTime: 0, gameTime: 0,
+        controlGroups: { 1: [], 2: [], 3: [], 4: [], 5: [] },
+        productionQueue: [],
+        attackMoveMode: false,
+        wave: 1, waveTimer: 0, nextWaveTime: 45000,
+        kills: 0, gameOver: false,
+        rallyPoint: null
+    };
+
+    // === UNIT DEFINITIONS ===
+    const unitTypes = {
+        probe: {
+            name: '프로브', cost: 50, buildTime: 1200, hp: 20, maxHp: 20,
+            shield: 20, maxShield: 20,
+            damage: 5, range: 15, speed: 2.5, supply: 1, faction: 'protoss',
+            color: '#33aaff', isWorker: true, harvestAmount: 8, harvestTime: 1500
+        },
+        zealot: {
+            name: '질럿', cost: 100, buildTime: 2000, hp: 100, maxHp: 100,
+            shield: 60, maxShield: 60,
+            damage: 16, range: 25, speed: 2.2, supply: 2, faction: 'protoss',
+            color: '#00aaff', attackSpeed: 500
+        },
+        dragoon: {
+            name: '드라곤', cost: 125, buildTime: 2500, hp: 100, maxHp: 100,
+            shield: 80, maxShield: 80,
+            damage: 20, range: 150, speed: 1.8, supply: 2, faction: 'protoss',
+            color: '#4a90d9', projectile: true, attackSpeed: 700
+        },
+        archon: {
+            name: '아콘', cost: 300, buildTime: 4000, hp: 10, maxHp: 10,
+            shield: 350, maxShield: 350,
+            damage: 30, range: 80, speed: 1.8, supply: 4, faction: 'protoss',
+            color: '#ff88ff', splash: 60, attackSpeed: 600
+        },
+        darkTemplar: {
+            name: '다크 템플러', cost: 200, buildTime: 3000, hp: 80, maxHp: 80,
+            shield: 40, maxShield: 40,
+            damage: 40, range: 20, speed: 2.4, supply: 2, faction: 'protoss',
+            color: '#6600aa', cloaked: true, attackSpeed: 700
+        },
+        carrier: {
+            name: '캐리어', cost: 350, buildTime: 5000, hp: 300, maxHp: 300,
+            shield: 150, maxShield: 150,
+            damage: 6, range: 200, speed: 1.2, supply: 6, faction: 'protoss',
+            color: '#3366aa', interceptorCount: 8, attackSpeed: 300
+        },
+        zergling: {
+            name: '저글링', cost: 25, buildTime: 1000, hp: 35, maxHp: 35,
+            damage: 5, range: 15, speed: 3.2, supply: 0.5, faction: 'zerg',
+            color: '#8B4513', attackSpeed: 350
+        },
+        hydralisk: {
+            name: '히드라리스크', cost: 75, buildTime: 1800, hp: 80, maxHp: 80,
+            damage: 10, range: 120, speed: 2.0, supply: 1, faction: 'zerg',
+            color: '#556B2F', projectile: true, attackSpeed: 500
+        },
+        mutalisk: {
+            name: '뮤탈리스크', cost: 100, buildTime: 2500, hp: 120, maxHp: 120,
+            damage: 9, range: 90, speed: 2.8, supply: 2, faction: 'zerg',
+            color: '#9932CC', projectile: true, attackSpeed: 600, flying: true
+        },
+        ultralisk: {
+            name: '울트라리스크', cost: 200, buildTime: 3500, hp: 400, maxHp: 400,
+            damage: 25, range: 20, speed: 1.5, supply: 4, faction: 'zerg',
+            color: '#4a3520', splash: 30, attackSpeed: 700
+        },
+        guardian: {
+            name: '가디언', cost: 150, buildTime: 3000, hp: 100, maxHp: 100,
+            damage: 20, range: 250, speed: 1.0, supply: 2, faction: 'zerg',
+            color: '#8B6914', projectile: true, attackSpeed: 1200, flying: true
+        }
+    };
+
+    // === RESIZE ===
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // === HELPERS ===
+    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function screenToWorld(sx, sy) { return { x: sx + game.camera.x, y: sy + game.camera.y }; }
+    function worldToScreen(wx, wy) { return { x: wx - game.camera.x, y: wy - game.camera.y }; }
+
+    let nextId = 1;
+
+    // === SPAWN ===
+    function spawnUnit(type, x, y, isPlayer) {
+        const t = unitTypes[type];
+        const unit = {
+            id: nextId++, x, y, type, ...t,
+            isPlayer, targetX: x, targetY: y,
+            attacking: null, attackCooldown: 0, angle: 0,
+            state: 'idle', holdPosition: false,
+            harvestTarget: null, carrying: 0, harvestCooldown: 0,
+            shieldRegen: 0
+        };
+        if (!unit.shield) unit.shield = 0;
+        if (!unit.maxShield) unit.maxShield = 0;
+        if (!unit.attackSpeed) unit.attackSpeed = 600;
+        game.units.push(unit);
+        if (isPlayer) game.supply.used += t.supply;
+        return unit;
+    }
+
+    function spawnBuilding(type, x, y, isPlayer) {
+        const b = {
+            id: nextId++, x, y, type, isPlayer,
+            hp: type === 'nexus' ? 750 : type === 'hatchery' ? 1500 : type === 'pylon' ? 300 : 500,
+            maxHp: type === 'nexus' ? 750 : type === 'hatchery' ? 1500 : type === 'pylon' ? 300 : 500,
+            shield: type === 'pylon' ? 300 : (isPlayer ? 200 : 0),
+            maxShield: type === 'pylon' ? 300 : (isPlayer ? 200 : 0)
+        };
+        game.buildings.push(b);
+        return b;
+    }
+
+    // === DRAWING ===
+    // Unit sprite sizes (width, height) for each type
+    const unitSpriteSize = {
+        probe: [28, 28], zealot: [36, 42], dragoon: [40, 40],
+        archon: [44, 44], darkTemplar: [34, 40], carrier: [52, 32],
+        zergling: [26, 22], hydralisk: [34, 38], mutalisk: [38, 34],
+        ultralisk: [48, 36], guardian: [40, 28]
+    };
+
+    function drawUnit(unit) {
+        const sp = worldToScreen(unit.x, unit.y);
+        if (sp.x < -60 || sp.x > canvas.width + 60 || sp.y < -60 || sp.y > canvas.height + 60) return;
+
+        const img = spriteImages[unit.type];
+        const sz = unitSpriteSize[unit.type] || [32, 32];
+        const w = sz[0], h = sz[1];
+
+        ctx.save();
+
+        // Cloak effect
+        if (unit.cloaked && unit.isPlayer) {
+            ctx.globalAlpha = 0.45 + Math.sin(game.gameTime / 200) * 0.2;
+        }
+
+        // Team color tint glow under unit
+        const teamColor = unit.isPlayer ? 'rgba(0,180,255,0.25)' : 'rgba(255,50,50,0.25)';
+        const glowR = Math.max(w, h) * 0.6;
+        const glow = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, glowR);
+        glow.addColorStop(0, teamColor);
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(sp.x, sp.y, glowR, 0, Math.PI * 2); ctx.fill();
+
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath(); ctx.ellipse(sp.x + 3, sp.y + h * 0.35, w * 0.4, h * 0.15, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Draw sprite image
+        if (img && img.complete && img.naturalWidth > 0) {
+            // Crop center of the image (unit is centered in the source image)
+            const srcW = img.naturalWidth, srcH = img.naturalHeight;
+            const cropFactor = 0.55; // crop inner portion where the unit is
+            const sx = srcW * (1 - cropFactor) / 2;
+            const sy = srcH * (1 - cropFactor) / 2;
+            const sw = srcW * cropFactor;
+            const sh = srcH * cropFactor;
+            ctx.drawImage(img, sx, sy, sw, sh, sp.x - w / 2, sp.y - h / 2, w, h);
+        } else {
+            // Fallback colored circle
+            ctx.fillStyle = unitTypes[unit.type].color;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, w * 0.4, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = unit.isPlayer ? '#00ff00' : '#ff4444'; ctx.lineWidth = 2; ctx.stroke();
+        }
+
+        // Carrying mineral indicator for probes
+        if (unit.carrying > 0) {
+            ctx.fillStyle = '#00ddff'; ctx.globalAlpha = 0.9;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y + h * 0.35, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+
+        // Special effects per unit type
+        if (unit.type === 'archon') {
+            ctx.strokeStyle = '#ff00ff'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.ellipse(sp.x, sp.y, w * 0.55, h * 0.2, game.gameTime / 500, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 1;
+        } else if (unit.type === 'zealot' && unit.attacking) {
+            // Psi blades glow when attacking
+            ctx.strokeStyle = '#00ccff'; ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.6 + Math.sin(game.gameTime / 80) * 0.4;
+            ctx.beginPath(); ctx.moveTo(sp.x - 14, sp.y + 6); ctx.lineTo(sp.x - 20, sp.y + 16); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sp.x + 14, sp.y + 6); ctx.lineTo(sp.x + 20, sp.y + 16); ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.restore();
+
+        // Health bar
+        const barY = sp.y - h / 2 - 10;
+        const barW = Math.max(36, w);
+
+        // Shield bar (blue, on top)
+        if (unit.maxShield > 0) {
+            const shPct = unit.shield / unit.maxShield;
+            ctx.fillStyle = '#222'; ctx.fillRect(sp.x - barW / 2, barY - 4, barW, 3);
+            ctx.fillStyle = '#3399ff'; ctx.fillRect(sp.x - barW / 2, barY - 4, barW * shPct, 3);
+        }
+        // HP bar
+        const hpPct = unit.hp / unit.maxHp;
+        ctx.fillStyle = '#222'; ctx.fillRect(sp.x - barW / 2, barY, barW, 4);
+        ctx.fillStyle = hpPct > 0.5 ? '#00ff00' : hpPct > 0.25 ? '#ffff00' : '#ff0000';
+        ctx.fillRect(sp.x - barW / 2, barY, barW * hpPct, 4);
+
+        // Selection circle
+        if (game.selectedUnits.includes(unit)) {
+            ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, Math.max(w, h) * 0.6, 0, Math.PI * 2); ctx.stroke();
+
+            if (unit.carrying > 0) {
+                ctx.fillStyle = '#00ddff'; ctx.font = '10px Arial';
+                ctx.fillText(unit.carrying, sp.x + w / 2 + 4, sp.y - h / 2);
+            }
+        }
+
+        // Attack move indicator
+        if (unit.state === 'attackMove' && unit.isPlayer) {
+            ctx.strokeStyle = '#ff8800'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, Math.max(w, h) * 0.65, 0, Math.PI * 2); ctx.stroke();
+        }
+    }
+
+    function drawBuilding(b) {
+        const sp = worldToScreen(b.x, b.y);
+        if (sp.x < -100 || sp.x > canvas.width + 100 || sp.y < -100 || sp.y > canvas.height + 100) return;
+
+        const img = spriteImages[b.type];
+        const isLarge = (b.type === 'nexus' || b.type === 'hatchery');
+        const bSize = isLarge ? 100 : 56;
+
+        ctx.save();
+
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath(); ctx.ellipse(sp.x + 4, sp.y + bSize * 0.35, bSize * 0.45, bSize * 0.15, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Team color base glow
+        if (b.type !== 'pylon') {
+            const teamColor = b.isPlayer ? 'rgba(0,120,255,0.2)' : 'rgba(200,50,20,0.2)';
+            const gr = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, bSize * 0.6);
+            gr.addColorStop(0, teamColor); gr.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gr;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, bSize * 0.6, 0, Math.PI * 2); ctx.fill();
+        }
+
+        if (img && img.complete && img.naturalWidth > 0) {
+            const srcW = img.naturalWidth, srcH = img.naturalHeight;
+            // Crop to center where the building actually is
+            const cropFactor = b.type === 'pylon' ? 0.5 : 0.7;
+            const sx = srcW * (1 - cropFactor) / 2;
+            const sy = srcH * (1 - cropFactor) / 2;
+            const sw = srcW * cropFactor;
+            const sh = srcH * cropFactor;
+            const drawH = bSize * (sh / sw); // maintain aspect ratio
+            ctx.drawImage(img, sx, sy, sw, sh, sp.x - bSize / 2, sp.y - drawH / 2, bSize, drawH);
+        } else {
+            // Fallback shapes
+            if (b.type === 'nexus') {
+                ctx.fillStyle = '#0077bb'; ctx.strokeStyle = '#005599'; ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(sp.x, sp.y - 40); ctx.lineTo(sp.x + 35, sp.y - 20);
+                ctx.lineTo(sp.x + 35, sp.y + 20); ctx.lineTo(sp.x, sp.y + 40);
+                ctx.lineTo(sp.x - 35, sp.y + 20); ctx.lineTo(sp.x - 35, sp.y - 20);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+            } else if (b.type === 'hatchery') {
+                ctx.fillStyle = '#6B3410'; ctx.strokeStyle = '#4A2008'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(sp.x, sp.y, 45, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            } else if (b.type === 'pylon') {
+                ctx.fillStyle = '#009955'; ctx.strokeStyle = '#006633'; ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(sp.x, sp.y - 22); ctx.lineTo(sp.x + 14, sp.y - 8);
+                ctx.lineTo(sp.x + 14, sp.y + 12); ctx.lineTo(sp.x, sp.y + 22);
+                ctx.lineTo(sp.x - 14, sp.y + 12); ctx.lineTo(sp.x - 14, sp.y - 8);
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+            }
+        }
+
+        // Pylon energy field effect
+        if (b.type === 'pylon') {
+            const grad = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, 35);
+            grad.addColorStop(0, 'rgba(0,255,170,0.15)'); grad.addColorStop(1, 'rgba(0,255,170,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, 35, 0, Math.PI * 2); ctx.fill();
+        }
+
+        ctx.restore();
+
+        // Health bar
+        const hpPct = b.hp / b.maxHp;
+        const bw = isLarge ? 80 : 44;
+        const barTop = sp.y - (isLarge ? 55 : 35);
+        ctx.fillStyle = '#222'; ctx.fillRect(sp.x - bw / 2, barTop, bw, 5);
+        ctx.fillStyle = hpPct > 0.5 ? '#00ff00' : '#ff0000';
+        ctx.fillRect(sp.x - bw / 2, barTop, bw * hpPct, 5);
+
+        if (b.maxShield > 0) {
+            const shPct = b.shield / b.maxShield;
+            ctx.fillStyle = '#222'; ctx.fillRect(sp.x - bw / 2, barTop - 5, bw, 3);
+            ctx.fillStyle = '#3399ff'; ctx.fillRect(sp.x - bw / 2, barTop - 5, bw * shPct, 3);
+        }
+    }
+
+    function drawMineral(m) {
+        const sp = worldToScreen(m.x, m.y);
+        if (sp.x < -30 || sp.x > canvas.width + 30 || sp.y < -30 || sp.y > canvas.height + 30) return;
+
+        const alpha = m.amount > 0 ? 1 : 0.3;
+        ctx.globalAlpha = alpha;
+
+        // Crystal shape
+        ctx.fillStyle = '#00bbee'; ctx.strokeStyle = '#0088aa'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(sp.x, sp.y - 18); ctx.lineTo(sp.x + 10, sp.y - 8);
+        ctx.lineTo(sp.x + 14, sp.y + 6); ctx.lineTo(sp.x + 4, sp.y + 14);
+        ctx.lineTo(sp.x - 4, sp.y + 14); ctx.lineTo(sp.x - 14, sp.y + 6);
+        ctx.lineTo(sp.x - 10, sp.y - 8);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        // Highlight
+        ctx.fillStyle = '#88eeff';
+        ctx.beginPath();
+        ctx.moveTo(sp.x - 4, sp.y - 12); ctx.lineTo(sp.x + 2, sp.y - 16);
+        ctx.lineTo(sp.x + 6, sp.y - 6); ctx.lineTo(sp.x, sp.y - 4);
+        ctx.closePath(); ctx.fill();
+
+        // Amount text
+        ctx.fillStyle = '#88ddff'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
+        ctx.fillText(m.amount, sp.x, sp.y + 26);
+        ctx.textAlign = 'left';
+
+        ctx.globalAlpha = 1;
+    }
+
+    // === TERRAIN ===
+    function drawTerrain() {
+        ctx.fillStyle = '#141428'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Grid
+        ctx.strokeStyle = '#1e1e38'; ctx.lineWidth = 1;
+        const startX = -(game.camera.x % 60);
+        const startY = -(game.camera.y % 60);
+        for (let x = startX; x < canvas.width; x += 60) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = startY; y < canvas.height; y += 60) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        // Random terrain details (rocks etc) - seeded by position
+        ctx.fillStyle = '#1a1a30';
+        for (let rx = 0; rx < MAP_W; rx += 400) {
+            for (let ry = 0; ry < MAP_H; ry += 400) {
+                const sp = worldToScreen(rx + 200, ry + 200);
+                if (sp.x > -100 && sp.x < canvas.width + 100 && sp.y > -100 && sp.y < canvas.height + 100) {
+                    const seed = (rx * 7 + ry * 13) % 100;
+                    if (seed < 20) {
+                        ctx.beginPath(); ctx.arc(sp.x, sp.y, 15 + seed % 10, 0, Math.PI * 2); ctx.fill();
+                    }
+                }
+            }
+        }
+    }
+
+    // === RENDER ===
+    function render() {
+        drawTerrain();
+        game.mineralsOnMap.forEach(m => drawMineral(m));
+        game.buildings.forEach(b => drawBuilding(b));
+
+        // Sort units by y for depth
+        const sorted = [...game.units].sort((a, b) => a.y - b.y);
+        sorted.forEach(u => drawUnit(u));
+
+        // Projectiles
+        game.projectiles.forEach(p => {
+            const sp = worldToScreen(p.x, p.y);
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+            // Trail
+            ctx.strokeStyle = p.color; ctx.lineWidth = 2; ctx.globalAlpha = 0.4;
+            ctx.beginPath(); ctx.moveTo(sp.x, sp.y);
+            ctx.lineTo(sp.x - p.vx * 3, sp.y - p.vy * 3); ctx.stroke();
+            ctx.globalAlpha = 1;
+        });
+
+        // Particles
+        game.particles.forEach(p => {
+            const sp = worldToScreen(p.x, p.y);
+            ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, p.size, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        // Selection box
+        if (game.isSelecting) {
+            const x = Math.min(game.selectionStart.x, game.mouse.x);
+            const y = Math.min(game.selectionStart.y, game.mouse.y);
+            const w = Math.abs(game.mouse.x - game.selectionStart.x);
+            const h = Math.abs(game.mouse.y - game.selectionStart.y);
+            ctx.strokeStyle = '#00ff00'; ctx.fillStyle = 'rgba(0,255,0,0.15)'; ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, w, h); ctx.fillRect(x, y, w, h);
+        }
+
+        // Attack move cursor indicator
+        if (game.attackMoveMode) {
+            ctx.strokeStyle = '#ff4400'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(game.mouse.x - 12, game.mouse.y); ctx.lineTo(game.mouse.x + 12, game.mouse.y);
+            ctx.moveTo(game.mouse.x, game.mouse.y - 12); ctx.lineTo(game.mouse.x, game.mouse.y + 12);
+            ctx.stroke();
+            ctx.beginPath(); ctx.arc(game.mouse.x, game.mouse.y, 14, 0, Math.PI * 2); ctx.stroke();
+        }
+
+        // Rally point
+        if (game.rallyPoint) {
+            const sp = worldToScreen(game.rallyPoint.x, game.rallyPoint.y);
+            ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(sp.x, sp.y, 8, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sp.x, sp.y - 12); ctx.lineTo(sp.x, sp.y + 12); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sp.x - 12, sp.y); ctx.lineTo(sp.x + 12, sp.y); ctx.stroke();
+        }
+
+        // Move command indicators
+        game.selectedUnits.forEach(u => {
+            if (u.state === 'moving' || u.state === 'attackMove') {
+                const tsp = worldToScreen(u.targetX, u.targetY);
+                ctx.strokeStyle = u.state === 'attackMove' ? 'rgba(255,136,0,0.3)' : 'rgba(0,255,0,0.3)';
+                ctx.lineWidth = 1;
+                const usp = worldToScreen(u.x, u.y);
+                ctx.beginPath(); ctx.moveTo(usp.x, usp.y); ctx.lineTo(tsp.x, tsp.y); ctx.stroke();
+            }
+        });
+
+        drawMinimap();
+    }
+
+    // === MINIMAP ===
+    function drawMinimap() {
+        const mw = minimapCanvas.width, mh = minimapCanvas.height;
+        minimapCtx.fillStyle = '#0a0a18'; minimapCtx.fillRect(0, 0, mw, mh);
+
+        const sx = mw / MAP_W, sy = mh / MAP_H;
+
+        // Minerals
+        game.mineralsOnMap.forEach(m => {
+            if (m.amount > 0) {
+                minimapCtx.fillStyle = '#00bbee';
+                minimapCtx.fillRect(m.x * sx - 2, m.y * sy - 2, 4, 3);
+            }
+        });
+
+        // Buildings
+        game.buildings.forEach(b => {
+            minimapCtx.fillStyle = b.isPlayer ? '#00aaff' : '#ff4444';
+            const s = b.type === 'pylon' ? 3 : 5;
+            minimapCtx.fillRect(b.x * sx - s/2, b.y * sy - s/2, s, s);
+        });
+
+        // Units
+        game.units.forEach(u => {
+            minimapCtx.fillStyle = u.isPlayer ? '#00ff00' : '#ff2222';
+            minimapCtx.fillRect(u.x * sx - 1, u.y * sy - 1, 2, 2);
+        });
+
+        // Camera viewport
+        minimapCtx.strokeStyle = '#ffffff'; minimapCtx.lineWidth = 1;
+        minimapCtx.strokeRect(
+            game.camera.x * sx, game.camera.y * sy,
+            canvas.width * sx, canvas.height * sy
+        );
+    }
+
+    // === COMBAT ===
+    function dealDamage(target, damage) {
+        if (target.shield > 0) {
+            const shieldDmg = Math.min(target.shield, damage);
+            target.shield -= shieldDmg;
+            damage -= shieldDmg;
+        }
+        target.hp -= damage;
+        if (target.hp <= 0) {
+            if (target.maxHp >= 300) { // building-ish
+                destroyBuilding(target);
+            } else {
+                destroyUnit(target);
+            }
+        }
+    }
+
+    function attack(attacker, target) {
+        if (!target || target.hp <= 0) return;
+
+        // Sound effects
+        if (attacker.faction === 'zerg') SFX.attackZerg();
+        else if (attacker.projectile || attacker.type === 'carrier') SFX.attackRanged();
+        else SFX.attackMelee();
+
+        if (attacker.type === 'carrier') {
+            // Interceptors
+            const count = attacker.interceptorCount || 4;
+            for (let i = 0; i < Math.min(count, 4); i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const ox = Math.cos(angle) * 15, oy = Math.sin(angle) * 15;
+                game.projectiles.push({
+                    x: attacker.x + ox, y: attacker.y + oy,
+                    target, damage: attacker.damage,
+                    speed: 6, color: '#00ccff',
+                    vx: 0, vy: 0
+                });
+            }
+            return;
+        }
+
+        if (attacker.projectile) {
+            const dx = target.x - attacker.x, dy = target.y - attacker.y;
+            const d = Math.hypot(dx, dy) || 1;
+            game.projectiles.push({
+                x: attacker.x, y: attacker.y, target,
+                damage: attacker.damage, speed: 7,
+                color: attacker.faction === 'protoss' ? '#00ccff' : attacker.faction === 'zerg' ? '#88cc22' : '#ff6644',
+                vx: (dx / d) * 7, vy: (dy / d) * 7,
+                splash: attacker.splash || 0
+            });
+        } else {
+            if (attacker.splash) {
+                // Splash damage
+                const splashR = attacker.splash;
+                game.units.forEach(u => {
+                    if (u.isPlayer !== attacker.isPlayer && dist(u, target) < splashR) {
+                        dealDamage(u, attacker.damage * (1 - dist(u, target) / splashR * 0.5));
+                    }
+                });
+                createParticles(target.x, target.y, '#ff8800', 8);
+                createParticles(target.x, target.y, '#ffcc00', 4);
+            } else {
+                dealDamage(target, attacker.damage);
+                createParticles(target.x, target.y, '#ff8800', 3);
+            }
+        }
+    }
+
+    function destroyUnit(unit) {
+        SFX.smallExplosion();
+        createParticles(unit.x, unit.y, '#ff4444', 12);
+        createParticles(unit.x, unit.y, '#ff8800', 8);
+        if (!unit.isPlayer) {
+            game.kills++;
+            game.minerals += Math.floor(unitTypes[unit.type].cost * 0.15);
+        }
+        if (unit.isPlayer) game.supply.used -= unitTypes[unit.type].supply;
+        game.units = game.units.filter(u => u !== unit);
+        game.selectedUnits = game.selectedUnits.filter(u => u !== unit);
+        // Clean up control groups
+        for (const g in game.controlGroups) {
+            game.controlGroups[g] = game.controlGroups[g].filter(u => u !== unit);
+        }
+        // Clean up attack targets
+        game.units.forEach(u => { if (u.attacking === unit) u.attacking = null; });
+    }
+
+    function destroyBuilding(b) {
+        SFX.explosion();
+        createParticles(b.x, b.y, '#ff4444', 20);
+        createParticles(b.x, b.y, '#ffaa00', 15);
+        createParticles(b.x, b.y, '#666666', 10);
+        game.buildings = game.buildings.filter(bb => bb !== b);
+
+        // Check game over
+        const playerBuildings = game.buildings.filter(bb => bb.isPlayer && bb.type === 'nexus');
+        const enemyBuildings = game.buildings.filter(bb => !bb.isPlayer && bb.type === 'hatchery');
+        if (playerBuildings.length === 0) endGame(false);
+        else if (enemyBuildings.length === 0) endGame(true);
+    }
+
+    function createParticles(x, y, color, count) {
+        for (let i = 0; i < count; i++) {
+            game.particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                life: 300 + Math.random() * 300,
+                maxLife: 300 + Math.random() * 300,
+                color,
+                size: 1.5 + Math.random() * 3
+            });
+        }
+    }
+
+    // === UNIT AI / UPDATE ===
+    function findNearestEnemy(unit, range) {
+        let best = null, bestDist = range || Infinity;
+        game.units.forEach(u => {
+            if (u.isPlayer !== unit.isPlayer && u.hp > 0) {
+                const d = dist(unit, u);
+                if (d < bestDist) { bestDist = d; best = u; }
+            }
+        });
+        // Also check buildings
+        game.buildings.forEach(b => {
+            if (b.isPlayer !== unit.isPlayer && b.hp > 0) {
+                const d = dist(unit, b);
+                if (d < bestDist) { bestDist = d; best = b; }
+            }
+        });
+        return best;
+    }
+
+    function moveToward(unit, tx, ty, dt) {
+        const dx = tx - unit.x, dy = ty - unit.y;
+        const d = Math.hypot(dx, dy);
+        if (d > 3) {
+            const speed = unit.speed * (dt / 16);
+            unit.x += (dx / d) * speed;
+            unit.y += (dy / d) * speed;
+            unit.angle = Math.atan2(dy, dx);
+            return false;
+        }
+        return true; // arrived
+    }
+
+    function unitCollision(unit) {
+        game.units.forEach(other => {
+            if (other === unit) return;
+            const d = dist(unit, other);
+            const minDist = 18;
+            if (d < minDist && d > 0) {
+                const push = (minDist - d) / 2;
+                const dx = (unit.x - other.x) / d, dy = (unit.y - other.y) / d;
+                unit.x += dx * push * 0.5;
+                unit.y += dy * push * 0.5;
+                other.x -= dx * push * 0.5;
+                other.y -= dy * push * 0.5;
+            }
+        });
+        // Keep in map
+        unit.x = clamp(unit.x, 10, MAP_W - 10);
+        unit.y = clamp(unit.y, 10, MAP_H - 10);
+    }
+
+    function updateUnit(unit, dt) {
+        // Shield regeneration (Protoss)
+        if (unit.maxShield > 0 && unit.shield < unit.maxShield) {
+            unit.shieldRegen += dt;
+            if (unit.shieldRegen > 500) {
+                unit.shield = Math.min(unit.maxShield, unit.shield + 1);
+                unit.shieldRegen = 0;
+            }
+        }
+
+        if (unit.attackCooldown > 0) unit.attackCooldown -= dt;
+
+        // Worker harvest logic
+        if (unit.isWorker && unit.state === 'harvesting') {
+            if (unit.harvestTarget && unit.harvestTarget.amount > 0) {
+                const d = dist(unit, unit.harvestTarget);
+                if (d > 30) {
+                    moveToward(unit, unit.harvestTarget.x, unit.harvestTarget.y, dt);
+                } else {
+                    unit.harvestCooldown -= dt;
+                    if (unit.harvestCooldown <= 0) {
+                        const amt = Math.min(unit.harvestAmount, unit.harvestTarget.amount);
+                        unit.carrying = amt;
+                        unit.harvestTarget.amount -= amt;
+                        unit.state = 'returning';
+                    }
+                }
+            } else {
+                unit.state = 'idle';
+            }
+            unitCollision(unit);
+            return;
+        }
+
+        if (unit.state === 'returning') {
+            const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus');
+            if (nexus) {
+                const d = dist(unit, nexus);
+                if (d > 50) {
+                    moveToward(unit, nexus.x, nexus.y, dt);
+                } else {
+                    game.minerals += unit.carrying;
+                    unit.carrying = 0;
+                    SFX.mineralReturn();
+                    if (unit.harvestTarget && unit.harvestTarget.amount > 0) {
+                        unit.state = 'harvesting';
+                        unit.harvestCooldown = unit.harvestTime;
+                    } else {
+                        unit.state = 'idle';
+                    }
+                }
+            }
+            unitCollision(unit);
+            return;
+        }
+
+        // Auto-attack: idle units look for enemies in sight range
+        if ((unit.state === 'idle' || unit.state === 'holdPosition') && !unit.attacking) {
+            const sightRange = (unit.range || 100) + 80;
+            const enemy = findNearestEnemy(unit, sightRange);
+            if (enemy) {
+                unit.attacking = enemy;
+                if (unit.state !== 'holdPosition') unit.state = 'attacking';
+            }
+        }
+
+        // Attack-move: move toward target, but engage enemies along the way
+        if (unit.state === 'attackMove') {
+            if (!unit.attacking) {
+                const searchRange = (unit.range || 100) + 100;
+                const enemy = findNearestEnemy(unit, searchRange);
+                if (enemy) {
+                    unit.attacking = enemy;
+                } else {
+                    const arrived = moveToward(unit, unit.targetX, unit.targetY, dt);
+                    if (arrived) unit.state = 'idle';
+                }
+            }
+        }
+
+        // Combat
+        if (unit.attacking) {
+            if (unit.attacking.hp <= 0) {
+                unit.attacking = null;
+                if (unit.state === 'attacking') unit.state = 'idle';
+                unitCollision(unit);
+                return;
+            }
+
+            const d = dist(unit, unit.attacking);
+            if (d > unit.range) {
+                if (unit.state !== 'holdPosition') {
+                    moveToward(unit, unit.attacking.x, unit.attacking.y, dt);
+                } else {
+                    // Hold position: lose target if out of range
+                    unit.attacking = null;
+                }
+            } else {
+                unit.angle = Math.atan2(unit.attacking.y - unit.y, unit.attacking.x - unit.x);
+                if (unit.attackCooldown <= 0) {
+                    attack(unit, unit.attacking);
+                    unit.attackCooldown = unit.attackSpeed || 600;
+                }
+            }
+            unitCollision(unit);
+            return;
+        }
+
+        // Movement
+        if (unit.state === 'moving') {
+            const arrived = moveToward(unit, unit.targetX, unit.targetY, dt);
+            if (arrived) unit.state = 'idle';
+        }
+
+        unitCollision(unit);
+    }
+
+    function updateProjectiles(dt) {
+        game.projectiles = game.projectiles.filter(p => {
+            if (!p.target || p.target.hp <= 0) return false;
+            const dx = p.target.x - p.x, dy = p.target.y - p.y;
+            const d = Math.hypot(dx, dy);
+            if (d < 12) {
+                if (p.splash) {
+                    game.units.forEach(u => {
+                        if (u.isPlayer !== (p.target.isPlayer ?? true)) {
+                            const sd = dist(u, p.target);
+                            if (sd < p.splash) dealDamage(u, p.damage * (1 - sd / p.splash * 0.5));
+                        }
+                    });
+                    createParticles(p.target.x, p.target.y, '#ff8800', 6);
+                } else {
+                    dealDamage(p.target, p.damage);
+                }
+                createParticles(p.x, p.y, p.color, 3);
+                return false;
+            }
+            const spd = p.speed * (dt / 16);
+            p.vx = (dx / d) * spd; p.vy = (dy / d) * spd;
+            p.x += p.vx; p.y += p.vy;
+            return true;
+        });
+    }
+
+    function updateParticles(dt) {
+        game.particles = game.particles.filter(p => {
+            p.x += p.vx * (dt / 16);
+            p.y += p.vy * (dt / 16);
+            p.vx *= 0.96; p.vy *= 0.96;
+            p.life -= dt;
+            return p.life > 0;
+        });
+    }
+
+    // === PRODUCTION ===
+    function updateProduction(dt) {
+        game.productionQueue.forEach(p => { p.elapsed += dt; });
+
+        const done = game.productionQueue.filter(p => p.elapsed >= p.buildTime);
+        done.forEach(p => {
+            const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus');
+            if (nexus) {
+                const rally = game.rallyPoint || { x: nexus.x + 80, y: nexus.y };
+                const angle = Math.random() * Math.PI * 2;
+                const unit = spawnUnit(p.type, nexus.x + Math.cos(angle) * 60, nexus.y + Math.sin(angle) * 60, true);
+                unit.targetX = rally.x + (Math.random() - 0.5) * 40;
+                unit.targetY = rally.y + (Math.random() - 0.5) * 40;
+                unit.state = 'moving';
+                SFX.buildComplete();
+                showMessage(`${unitTypes[p.type].name} 생산 완료!`, '#00cc44');
+            }
+        });
+        game.productionQueue = game.productionQueue.filter(p => p.elapsed < p.buildTime);
+
+        // Update production bar UI
+        const bar = document.getElementById('productionBar');
+        if (game.productionQueue.length > 0) {
+            bar.style.display = 'flex';
+            bar.innerHTML = game.productionQueue.map(p => {
+                const pct = (p.elapsed / p.buildTime) * 100;
+                return `<div class="prod-item"><div class="prog-fill" style="height:${pct}%"></div><span style="position:relative;z-index:1;font-size:10px;color:#fff;">${unitTypes[p.type].name.charAt(0)}</span></div>`;
+            }).join('');
+        } else {
+            bar.style.display = 'none';
+        }
+    }
+
+    // === ENEMY AI ===
+    function enemyAI(dt) {
+        game.waveTimer += dt;
+
+        // Passive spawning
+        const enemyCount = game.units.filter(u => !u.isPlayer).length;
+        if (enemyCount < 3 + game.wave * 2) {
+            if (Math.random() < 0.01) {
+                const hatch = game.buildings.find(b => b.type === 'hatchery');
+                if (hatch) {
+                    const types = ['zergling', 'zergling', 'hydralisk'];
+                    if (game.wave >= 3) types.push('mutalisk');
+                    if (game.wave >= 5) types.push('ultralisk');
+                    if (game.wave >= 7) types.push('guardian');
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    spawnUnit(type, hatch.x + (Math.random() - 0.5) * 100, hatch.y + (Math.random() - 0.5) * 100, false);
+                }
+            }
+        }
+
+        // Wave attack
+        if (game.waveTimer >= game.nextWaveTime) {
+            game.waveTimer = 0;
+            game.wave++;
+            game.nextWaveTime = Math.max(20000, 45000 - game.wave * 2000);
+            SFX.waveWarning();
+            showMessage(`WAVE ${game.wave} 시작!`, '#ff4444');
+
+            const hatch = game.buildings.find(b => b.type === 'hatchery');
+            if (hatch) {
+                const waveSize = 3 + game.wave * 2;
+                for (let i = 0; i < waveSize; i++) {
+                    setTimeout(() => {
+                        if (game.gameOver) return;
+                        const types = ['zergling', 'zergling', 'hydralisk'];
+                        if (game.wave >= 3) types.push('mutalisk', 'hydralisk');
+                        if (game.wave >= 5) types.push('ultralisk');
+                        if (game.wave >= 7) types.push('guardian');
+                        const type = types[Math.floor(Math.random() * types.length)];
+                        const u = spawnUnit(type, hatch.x + (Math.random() - 0.5) * 120, hatch.y + (Math.random() - 0.5) * 120, false);
+                        // Send toward player base
+                        const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus');
+                        if (nexus) {
+                            u.targetX = nexus.x + (Math.random() - 0.5) * 200;
+                            u.targetY = nexus.y + (Math.random() - 0.5) * 200;
+                            u.state = 'attackMove';
+                        }
+                    }, i * 300);
+                }
+            }
+        }
+
+        // Enemy unit behavior
+        game.units.filter(u => !u.isPlayer).forEach(u => {
+            if (u.state === 'idle' && !u.attacking) {
+                // Look for nearby player units/buildings to attack
+                const target = findNearestEnemy(u, 300);
+                if (target) {
+                    u.attacking = target;
+                    u.state = 'attacking';
+                } else if (Math.random() < 0.005) {
+                    // Occasionally patrol
+                    const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus');
+                    if (nexus) {
+                        u.targetX = nexus.x + (Math.random() - 0.5) * 400;
+                        u.targetY = nexus.y + (Math.random() - 0.5) * 400;
+                        u.state = 'attackMove';
+                    }
+                }
+            }
+        });
+    }
+
+    // === SHIELD REGEN FOR BUILDINGS ===
+    function updateBuildingShields(dt) {
+        game.buildings.forEach(b => {
+            if (b.maxShield > 0 && b.shield < b.maxShield) {
+                b.shield = Math.min(b.maxShield, b.shield + dt * 0.002);
+            }
+        });
+    }
+
+    // === CAMERA ===
+    const keysDown = {};
+    function updateCamera() {
+        let dx = 0, dy = 0;
+        if (keysDown['ArrowLeft'] || game.mouse.x < EDGE_SCROLL_ZONE) dx = -SCROLL_SPEED;
+        if (keysDown['ArrowRight'] || game.mouse.x > canvas.width - EDGE_SCROLL_ZONE) dx = SCROLL_SPEED;
+        if (keysDown['ArrowUp'] || game.mouse.y < EDGE_SCROLL_ZONE) dy = -SCROLL_SPEED;
+        if (keysDown['ArrowDown'] || game.mouse.y > canvas.height - EDGE_SCROLL_ZONE) dy = SCROLL_SPEED;
+        game.camera.x = clamp(game.camera.x + dx, 0, MAP_W - canvas.width);
+        game.camera.y = clamp(game.camera.y + dy, 0, MAP_H - canvas.height);
+    }
+
+    // === MAIN UPDATE ===
+    function update(dt) {
+        if (game.gameOver) return;
+        game.gameTime += dt;
+
+        updateCamera();
+
+        game.units.forEach(u => updateUnit(u, dt));
+        updateProjectiles(dt);
+        updateParticles(dt);
+        updateProduction(dt);
+        updateBuildingShields(dt);
+        enemyAI(dt);
+
+        // Passive mineral income
+        if (Math.floor(game.gameTime / 3000) > Math.floor((game.gameTime - dt) / 3000)) {
+            game.minerals += 2;
+        }
+    }
+
+    // === UI ===
+    let messageTimeout = null;
+    function showMessage(text, color) {
+        const msgDiv = document.getElementById('gameMessage');
+        msgDiv.textContent = text;
+        msgDiv.style.background = color || 'rgba(255,0,0,0.9)';
+        msgDiv.style.opacity = '1';
+        if (messageTimeout) clearTimeout(messageTimeout);
+        messageTimeout = setTimeout(() => { msgDiv.style.opacity = '0'; }, 2500);
+    }
+
+    function queueUnit(type) {
+        const t = unitTypes[type];
+        if (game.minerals < t.cost) { SFX.error(); return showMessage('미네랄이 부족합니다!', '#cc0000'); }
+        if (game.supply.used + t.supply > game.supply.max) { SFX.error(); return showMessage('보급이 부족합니다! 파일런을 건설하세요.', '#cc0000'); }
+        if (game.productionQueue.length >= 7) { SFX.error(); return showMessage('생산 대기열이 가득 찼습니다!', '#cc6600'); }
+        game.minerals -= t.cost;
+        game.productionQueue.push({ type, buildTime: t.buildTime, elapsed: 0 });
+        SFX.select();
+        updateUI();
+    }
+
+    function buildPylon() {
+        if (game.minerals < 100) { SFX.error(); return showMessage('미네랄이 부족합니다!', '#cc0000'); }
+        const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus');
+        if (!nexus) return;
+        const pylonCount = game.buildings.filter(b => b.isPlayer && b.type === 'pylon').length;
+        const angle = pylonCount * Math.PI / 3 + Math.PI / 6;
+        const px = nexus.x + Math.cos(angle) * 120;
+        const py = nexus.y + Math.sin(angle) * 120;
+        game.minerals -= 100;
+        spawnBuilding('pylon', px, py, true);
+        game.supply.max += 8;
+        SFX.pylonBuilt();
+        showMessage('파일런 건설! 보급 +8', '#00cc44');
+        updateUI();
+    }
+
+    function updateUI() {
+        document.getElementById('mineralCount').textContent = Math.floor(game.minerals);
+        document.getElementById('supplyCount').textContent = `${Math.ceil(game.supply.used)}/${game.supply.max}`;
+        document.getElementById('waveCount').textContent = game.wave;
+        document.getElementById('killCount').textContent = `${game.kills} kills`;
+
+        const info = document.getElementById('unitInfo');
+        if (game.selectedUnits.length > 0) {
+            const u = game.selectedUnits[0];
+            document.getElementById('selectedUnitName').textContent =
+                `${u.name} ${game.selectedUnits.length > 1 ? `(${game.selectedUnits.length}개)` : ''}`;
+            const portrait = document.getElementById('selectedUnitPortrait');
+            if (spriteList[u.type]) {
+                portrait.src = spriteList[u.type];
+                portrait.style.display = 'block';
+            } else { portrait.style.display = 'none'; }
+            const hpPct = (u.hp / u.maxHp) * 100;
+            const hpBar = document.getElementById('selectedUnitHealth');
+            hpBar.style.width = `${hpPct}%`;
+            hpBar.style.background = hpPct > 50 ? 'linear-gradient(90deg,#44ff44,#88ff88)' : hpPct > 25 ? '#ffff00' : '#ff4444';
+
+            const shieldContainer = document.getElementById('shieldBarContainer');
+            if (u.maxShield > 0) {
+                shieldContainer.style.display = 'block';
+                document.getElementById('selectedUnitShield').style.width = `${(u.shield / u.maxShield) * 100}%`;
+            } else {
+                shieldContainer.style.display = 'none';
+            }
+
+            document.getElementById('selectedUnitStats').innerHTML =
+                `HP: ${Math.ceil(u.hp)}/${u.maxHp} | DMG: ${u.damage} | RNG: ${u.range}` +
+                (u.maxShield > 0 ? ` | SH: ${Math.ceil(u.shield)}/${u.maxShield}` : '') +
+                (u.carrying > 0 ? ` | 운반: ${u.carrying}` : '');
+            info.style.display = 'block';
+        } else {
+            info.style.display = 'none';
+        }
+
+        // Button states - only check player-producible units
+        ['probe', 'zealot', 'dragoon', 'archon', 'darkTemplar', 'carrier'].forEach(type => {
+            const btnId = 'btn' + type.charAt(0).toUpperCase() + type.slice(1);
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                const t = unitTypes[type];
+                btn.disabled = game.minerals < t.cost || game.supply.used + t.supply > game.supply.max;
+            }
+        });
+        const pylonBtn = document.getElementById('btnPylon');
+        if (pylonBtn) pylonBtn.disabled = game.minerals < 100;
+
+        // Control group indicators
+        for (let i = 1; i <= 5; i++) {
+            const el = document.getElementById('grp' + i);
+            el.className = 'group-btn' + (game.controlGroups[i].length > 0 ? ' active' : '');
+        }
+    }
+
+    // === INPUT ===
+    canvas.addEventListener('mousedown', e => {
+        const wx = e.clientX + game.camera.x, wy = e.clientY + game.camera.y;
+        game.mouse.down = true;
+        game.mouse.x = e.clientX; game.mouse.y = e.clientY;
+        game.mouse.worldX = wx; game.mouse.worldY = wy;
+
+        if (e.button === 0) {
+            if (game.attackMoveMode) {
+                // Attack-move command
+                game.selectedUnits.forEach(u => {
+                    u.targetX = wx; u.targetY = wy;
+                    u.state = 'attackMove'; u.attacking = null;
+                });
+                game.attackMoveMode = false;
+                canvas.style.cursor = 'crosshair';
+            } else {
+                game.selectionStart = { x: e.clientX, y: e.clientY };
+                game.isSelecting = true;
+            }
+        } else if (e.button === 2) {
+            handleRightClick(wx, wy);
+            e.preventDefault();
+        }
+    });
+
+    canvas.addEventListener('mousemove', e => {
+        game.mouse.x = e.clientX; game.mouse.y = e.clientY;
+        game.mouse.worldX = e.clientX + game.camera.x;
+        game.mouse.worldY = e.clientY + game.camera.y;
+    });
+
+    canvas.addEventListener('mouseup', e => {
+        if (game.isSelecting && e.button === 0) handleSelection();
+        game.mouse.down = false; game.isSelecting = false;
+    });
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Minimap click
+    minimapCanvas.addEventListener('mousedown', e => {
+        const rect = minimapCanvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) / rect.width * MAP_W;
+        const my = (e.clientY - rect.top) / rect.height * MAP_H;
+        game.camera.x = clamp(mx - canvas.width / 2, 0, MAP_W - canvas.width);
+        game.camera.y = clamp(my - canvas.height / 2, 0, MAP_H - canvas.height);
+    });
+
+    function handleSelection() {
+        const wx1 = Math.min(game.selectionStart.x, game.mouse.x) + game.camera.x;
+        const wy1 = Math.min(game.selectionStart.y, game.mouse.y) + game.camera.y;
+        const wx2 = Math.max(game.selectionStart.x, game.mouse.x) + game.camera.x;
+        const wy2 = Math.max(game.selectionStart.y, game.mouse.y) + game.camera.y;
+
+        const boxW = wx2 - wx1, boxH = wy2 - wy1;
+
+        if (boxW < 5 && boxH < 5) {
+            // Single click selection
+            let closest = null, closestDist = 30;
+            game.units.forEach(u => {
+                if (u.isPlayer) {
+                    const d = dist({ x: game.mouse.worldX, y: game.mouse.worldY }, u);
+                    if (d < closestDist) { closestDist = d; closest = u; }
+                }
+            });
+            game.selectedUnits = closest ? [closest] : [];
+        } else {
+            // Box selection
+            game.selectedUnits = game.units.filter(u =>
+                u.isPlayer && u.x >= wx1 && u.x <= wx2 && u.y >= wy1 && u.y <= wy2
+            );
+        }
+        if (game.selectedUnits.length > 0) SFX.select();
+        updateUI();
+    }
+
+    function handleRightClick(wx, wy) {
+        if (game.selectedUnits.length === 0) return;
+
+        // Check if clicking on mineral
+        let mineral = null;
+        for (const m of game.mineralsOnMap) {
+            if (m.amount > 0 && Math.hypot(m.x - wx, m.y - wy) < 25) { mineral = m; break; }
+        }
+
+        if (mineral) {
+            // Send workers to harvest
+            SFX.harvest();
+            game.selectedUnits.forEach(u => {
+                if (u.isWorker) {
+                    u.harvestTarget = mineral;
+                    u.state = 'harvesting';
+                    u.harvestCooldown = u.harvestTime;
+                    u.attacking = null;
+                }
+            });
+            return;
+        }
+
+        // Check if clicking on enemy
+        let target = null;
+        for (const u of game.units) {
+            if (!u.isPlayer && Math.hypot(u.x - wx, u.y - wy) < 25) { target = u; break; }
+        }
+        if (!target) {
+            for (const b of game.buildings) {
+                if (!b.isPlayer && Math.hypot(b.x - wx, b.y - wy) < 60) { target = b; break; }
+            }
+        }
+
+        // Check if clicking on own nexus (set rally point)
+        const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus' && Math.hypot(b.x - wx, b.y - wy) < 50);
+        // If we have nexus selected... no, just set rally if shift+right-click or if clicking on ground with nexus context
+
+        game.selectedUnits.forEach(u => {
+            if (target) {
+                u.attacking = target;
+                u.state = 'attacking';
+                u.targetX = target.x; u.targetY = target.y;
+            } else {
+                u.attacking = null;
+                u.state = 'moving';
+                u.holdPosition = false;
+                // Formation spread
+                const idx = game.selectedUnits.indexOf(u);
+                const cols = Math.ceil(Math.sqrt(game.selectedUnits.length));
+                const row = Math.floor(idx / cols), col = idx % cols;
+                u.targetX = wx + (col - cols / 2) * 30;
+                u.targetY = wy + (row - Math.ceil(game.selectedUnits.length / cols) / 2) * 30;
+            }
+        });
+
+        // Set rally point
+        if (!target) {
+            game.rallyPoint = { x: wx, y: wy };
+        }
+
+        // Sound + Move command particles
+        SFX.move();
+        createParticles(wx, wy, target ? '#ff4444' : '#00ff44', 5);
+    }
+
+    // Keyboard
+    window.addEventListener('keydown', e => {
+        keysDown[e.key] = true;
+
+        if (e.key === 'a' || e.key === 'A') {
+            if (game.selectedUnits.length > 0) {
+                game.attackMoveMode = true;
+                canvas.style.cursor = 'url("data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><circle cx=\'16\' cy=\'16\' r=\'14\' fill=\'none\' stroke=\'red\' stroke-width=\'2\'/><line x1=\'4\' y1=\'16\' x2=\'28\' y2=\'16\' stroke=\'red\' stroke-width=\'2\'/><line x1=\'16\' y1=\'4\' x2=\'16\' y2=\'28\' stroke=\'red\' stroke-width=\'2\'/></svg>") 16 16, crosshair';
+            }
+        }
+
+        if (e.key === 's' || e.key === 'S') {
+            game.selectedUnits.forEach(u => {
+                u.state = 'idle'; u.attacking = null; u.holdPosition = false;
+                u.targetX = u.x; u.targetY = u.y;
+            });
+        }
+
+        if (e.key === 'h' || e.key === 'H') {
+            game.selectedUnits.forEach(u => {
+                u.state = 'holdPosition'; u.holdPosition = true;
+                u.targetX = u.x; u.targetY = u.y;
+            });
+        }
+
+        if (e.key === ' ') {
+            const nexus = game.buildings.find(b => b.isPlayer && b.type === 'nexus');
+            if (nexus) {
+                game.camera.x = clamp(nexus.x - canvas.width / 2, 0, MAP_W - canvas.width);
+                game.camera.y = clamp(nexus.y - canvas.height / 2, 0, MAP_H - canvas.height);
+            }
+            e.preventDefault();
+        }
+
+        // Escape
+        if (e.key === 'Escape') {
+            game.attackMoveMode = false;
+            canvas.style.cursor = 'crosshair';
+            game.selectedUnits = [];
+            updateUI();
+        }
+
+        // Control groups
+        if (e.key >= '1' && e.key <= '5') {
+            const g = parseInt(e.key);
+            if (e.ctrlKey) {
+                game.controlGroups[g] = [...game.selectedUnits];
+                showMessage(`부대 ${g} 지정 (${game.selectedUnits.length}개)`, '#4488ff');
+            } else {
+                if (game.controlGroups[g].length > 0) {
+                    // Filter out dead units
+                    game.controlGroups[g] = game.controlGroups[g].filter(u => game.units.includes(u));
+                    game.selectedUnits = [...game.controlGroups[g]];
+                    // Double tap: center camera
+                    if (game.selectedUnits.length > 0) {
+                        const cx = game.selectedUnits.reduce((s, u) => s + u.x, 0) / game.selectedUnits.length;
+                        const cy = game.selectedUnits.reduce((s, u) => s + u.y, 0) / game.selectedUnits.length;
+                        game.camera.x = clamp(cx - canvas.width / 2, 0, MAP_W - canvas.width);
+                        game.camera.y = clamp(cy - canvas.height / 2, 0, MAP_H - canvas.height);
+                    }
+                    updateUI();
+                }
+            }
+        }
+
+        // Production hotkeys
+        const prodKeys = { q: 'probe', w: 'zealot', e: 'dragoon', r: 'archon', t: 'darkTemplar', y: 'carrier', p: 'pylon' };
+        const lower = e.key.toLowerCase();
+        if (prodKeys[lower] && !e.ctrlKey) {
+            if (lower === 'p') buildPylon();
+            else queueUnit(prodKeys[lower]);
+        }
+    });
+
+    window.addEventListener('keyup', e => { keysDown[e.key] = false; });
+
+    function selectGroup(g) {
+        if (game.controlGroups[g].length > 0) {
+            game.controlGroups[g] = game.controlGroups[g].filter(u => game.units.includes(u));
+            game.selectedUnits = [...game.controlGroups[g]];
+            updateUI();
+        }
+    }
+
+    // === GAME OVER ===
+    function endGame(won) {
+        game.gameOver = true;
+        stopMusic();
+        if (won) SFX.victory(); else SFX.defeat();
+        const screen = document.getElementById('gameOverScreen');
+        screen.style.display = 'flex';
+        document.getElementById('gameOverTitle').textContent = won ? 'VICTORY!' : 'DEFEAT';
+        document.getElementById('gameOverTitle').style.color = won ? '#00ff44' : '#ff4444';
+        document.getElementById('gameOverStats').innerHTML =
+            `Wave: ${game.wave}<br>Kills: ${game.kills}<br>Time: ${Math.floor(game.gameTime / 1000)}s`;
+    }
+
+    // === START ===
+    function startGame() {
+        document.getElementById('startScreen').style.display = 'none';
+
+        // Initialize audio & start music
+        initAudio();
+        startMusic();
+
+        // Place nexus
+        spawnBuilding('nexus', 400, MAP_H / 2, true);
+        // Place hatchery far away
+        spawnBuilding('hatchery', MAP_W - 400, MAP_H / 2, false);
+
+        // Mineral patches near nexus
+        const mineralPositions = [
+            { x: 200, y: MAP_H / 2 - 120 }, { x: 180, y: MAP_H / 2 - 60 },
+            { x: 160, y: MAP_H / 2 }, { x: 180, y: MAP_H / 2 + 60 },
+            { x: 200, y: MAP_H / 2 + 120 }, { x: 230, y: MAP_H / 2 - 90 },
+            { x: 230, y: MAP_H / 2 + 90 }, { x: 150, y: MAP_H / 2 - 30 },
+        ];
+        mineralPositions.forEach(pos => game.mineralsOnMap.push({ ...pos, amount: 1500 }));
+
+        // Mineral patches near hatchery
+        const enemyMineralPositions = [
+            { x: MAP_W - 200, y: MAP_H / 2 - 100 }, { x: MAP_W - 180, y: MAP_H / 2 - 40 },
+            { x: MAP_W - 160, y: MAP_H / 2 + 20 }, { x: MAP_W - 200, y: MAP_H / 2 + 80 },
+        ];
+        enemyMineralPositions.forEach(pos => game.mineralsOnMap.push({ ...pos, amount: 1500 }));
+
+        // Some minerals in the middle
+        for (let i = 0; i < 4; i++) {
+            game.mineralsOnMap.push({
+                x: MAP_W / 2 + (Math.random() - 0.5) * 600,
+                y: MAP_H / 2 + (Math.random() - 0.5) * 400,
+                amount: 800
+            });
+        }
+
+        // Starting units
+        spawnUnit('probe', 450, MAP_H / 2 - 30, true);
+        spawnUnit('probe', 460, MAP_H / 2 + 30, true);
+        spawnUnit('probe', 440, MAP_H / 2, true);
+        spawnUnit('probe', 470, MAP_H / 2 - 60, true);
+        spawnUnit('zealot', 520, MAP_H / 2, true);
+        spawnUnit('zealot', 540, MAP_H / 2 + 40, true);
+
+        // Starting enemy units
+        for (let i = 0; i < 4; i++) {
+            spawnUnit('zergling', MAP_W - 500 + Math.random() * 100, MAP_H / 2 - 50 + Math.random() * 100, false);
+        }
+        spawnUnit('hydralisk', MAP_W - 450, MAP_H / 2, false);
+
+        // Set rally point
+        game.rallyPoint = { x: 550, y: MAP_H / 2 };
+
+        // Center camera on nexus
+        game.camera.x = clamp(400 - canvas.width / 2, 0, MAP_W - canvas.width);
+        game.camera.y = clamp(MAP_H / 2 - canvas.height / 2, 0, MAP_H - canvas.height);
+
+        updateUI();
+        requestAnimationFrame(loop);
+    }
+
+    function loop(timestamp) {
+        const dt = Math.min(timestamp - game.lastTime, 50); // cap dt to prevent physics explosions
+        game.lastTime = timestamp;
+        update(dt);
+        render();
+        updateUI();
+        requestAnimationFrame(loop);
+    }
+    </script>
+</body>
+</html>
