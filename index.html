@@ -202,13 +202,10 @@
         </div>
 
         <div class="unit-info" id="unitInfo" style="display: none;">
-            <div style="display:flex;gap:10px;align-items:center;">
-                <img id="selectedUnitPortrait" src="" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:2px solid #00d4ff;display:none;">
-                <div style="flex:1;">
-                    <div class="unit-info-header" id="selectedUnitName">유닛 정보</div>
-                    <div class="health-bar"><div class="health-fill" id="selectedUnitHealth" style="width:100%;background:linear-gradient(90deg,#44ff44,#88ff88);"></div></div>
-                    <div class="shield-bar" id="shieldBarContainer" style="display:none;"><div class="shield-fill" id="selectedUnitShield" style="width:100%;"></div></div>
-                </div>
+            <div>
+                <div class="unit-info-header" id="selectedUnitName">유닛 정보</div>
+                <div class="health-bar"><div class="health-fill" id="selectedUnitHealth" style="width:100%;background:linear-gradient(90deg,#44ff44,#88ff88);"></div></div>
+                <div class="shield-bar" id="shieldBarContainer" style="display:none;"><div class="shield-fill" id="selectedUnitShield" style="width:100%;"></div></div>
             </div>
             <div class="unit-info-stats" id="selectedUnitStats"></div>
         </div>
@@ -216,43 +213,43 @@
         <div class="control-panel">
             <button class="unit-btn" id="btnProbe" onclick="queueUnit('probe')">
                 <span class="hotkey">Q</span>
-                <img class="unit-portrait" src="sprites/probe.jpg" alt="프로브">
+                <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#e8b830" stroke="#222" stroke-width="2"/><circle cx="20" cy="20" r="5" fill="#cc2200"/><circle cx="19" cy="19" r="2" fill="#ff6644"/><line x1="20" y1="9" x2="20" y2="3" stroke="#c8a020" stroke-width="2"/><circle cx="20" cy="3" r="2.5" fill="#ff3300"/></svg>
                 <span class="cost">50</span>
                 <span>프로브</span>
             </button>
             <button class="unit-btn" id="btnZealot" onclick="queueUnit('zealot')">
                 <span class="hotkey">W</span>
-                <img class="unit-portrait" src="sprites/zealot.jpg" alt="질럿">
+                <svg viewBox="0 0 40 40"><ellipse cx="20" cy="20" rx="12" ry="14" fill="#e8b830" stroke="#222" stroke-width="2"/><polygon points="20,4 13,12 27,12" fill="#d4a020" stroke="#222" stroke-width="1.5"/><ellipse cx="16" cy="18" rx="3.5" ry="4" fill="#00ccff"/><ellipse cx="24" cy="18" rx="3.5" ry="4" fill="#00ccff"/><line x1="6" y1="22" x2="1" y2="16" stroke="#00ddff" stroke-width="2.5"/><line x1="34" y1="22" x2="39" y2="16" stroke="#00ddff" stroke-width="2.5"/></svg>
                 <span class="cost">100</span>
                 <span>질럿</span>
             </button>
             <button class="unit-btn" id="btnDragoon" onclick="queueUnit('dragoon')">
                 <span class="hotkey">E</span>
-                <img class="unit-portrait" src="sprites/dragoon.jpg" alt="드라곤">
+                <svg viewBox="0 0 40 40"><rect x="8" y="28" width="5" height="8" fill="#3a6a99"/><rect x="27" y="28" width="5" height="8" fill="#3a6a99"/><ellipse cx="20" cy="20" rx="14" ry="12" fill="#4a90d9" stroke="#222" stroke-width="2"/><circle cx="20" cy="18" r="6" fill="#00ffff"/><circle cx="20" cy="18" r="3" fill="#005588"/><circle cx="18" cy="16" r="1.5" fill="#aaffff"/></svg>
                 <span class="cost">125</span>
                 <span>드라곤</span>
             </button>
             <button class="unit-btn" id="btnArchon" onclick="queueUnit('archon')">
                 <span class="hotkey">R</span>
-                <img class="unit-portrait" src="sprites/archon.jpg" alt="아콘">
+                <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="url(#archGrad)" opacity="0.5"/><circle cx="20" cy="20" r="12" fill="#dd88ff" stroke="#222" stroke-width="2"/><ellipse cx="16" cy="18" rx="3" ry="3.5" fill="#fff"/><ellipse cx="24" cy="18" rx="3" ry="3.5" fill="#fff"/><circle cx="16" cy="19" r="1.5" fill="#111"/><circle cx="24" cy="19" r="1.5" fill="#111"/><path d="M16 24 Q20 27 24 24" stroke="#333" stroke-width="1.5" fill="none"/><defs><radialGradient id="archGrad"><stop offset="0%" stop-color="#ffaaff"/><stop offset="100%" stop-color="#6600cc" stop-opacity="0"/></radialGradient></defs></svg>
                 <span class="cost">300</span>
                 <span>아콘</span>
             </button>
             <button class="unit-btn" id="btnDarkTemplar" onclick="queueUnit('darkTemplar')">
                 <span class="hotkey">T</span>
-                <img class="unit-portrait" src="sprites/darktemplar.jpg" alt="다크템플러">
+                <svg viewBox="0 0 40 40"><polygon points="20,6 30,22 26,34 14,34 10,22" fill="#3a0066" stroke="#222" stroke-width="2"/><circle cx="16" cy="20" r="3" fill="#00ff88"/><circle cx="24" cy="20" r="3" fill="#00ff88"/><line x1="30" y1="22" x2="38" y2="14" stroke="#00ff44" stroke-width="2.5"/></svg>
                 <span class="cost">200</span>
                 <span>다크템플러</span>
             </button>
             <button class="unit-btn" id="btnCarrier" onclick="queueUnit('carrier')">
                 <span class="hotkey">Y</span>
-                <img class="unit-portrait" src="sprites/carrier.jpg" alt="캐리어">
+                <svg viewBox="0 0 40 40"><ellipse cx="20" cy="22" rx="18" ry="10" fill="#c8a030" stroke="#222" stroke-width="2"/><polygon points="10,14 20,6 30,14" fill="#e8c840" stroke="#222" stroke-width="1.5"/><ellipse cx="20" cy="20" rx="7" ry="5" fill="#00bbff"/><circle cx="18" cy="19" r="2" fill="#fff"/><circle cx="22" cy="19" r="2" fill="#fff"/><circle cx="18" cy="20" r="1" fill="#111"/><circle cx="22" cy="20" r="1" fill="#111"/></svg>
                 <span class="cost">350</span>
                 <span>캐리어</span>
             </button>
             <button class="unit-btn" id="btnPylon" onclick="buildPylon()" style="border-color:#00cc66;">
                 <span class="hotkey">P</span>
-                <img class="unit-portrait" src="sprites/pylon.jpg" alt="파일런">
+                <svg viewBox="0 0 40 40"><path d="M20,4 Q34,16 32,28 L20,36 L8,28 Q6,16 20,4 Z" fill="#22aa66" stroke="#222" stroke-width="2"/><ellipse cx="20" cy="20" rx="5" ry="7" fill="#44ffaa"/><ellipse cx="17" cy="13" rx="3" ry="5" fill="rgba(255,255,255,0.3)"/></svg>
                 <span class="cost">100</span>
                 <span>파일런</span>
             </button>
@@ -635,115 +632,343 @@
         return b;
     }
 
-    // === DRAWING ===
-    // Unit sprite sizes (width, height) for each type
-    const unitSpriteSize = {
-        probe: [28, 28], zealot: [36, 42], dragoon: [40, 40],
-        archon: [44, 44], darkTemplar: [34, 40], carrier: [52, 32],
-        zergling: [26, 22], hydralisk: [34, 38], mutalisk: [38, 34],
-        ultralisk: [48, 36], guardian: [40, 28]
-    };
+    // === CARBOT-STYLE DRAWING ===
+    // Helper: draw cute eyes
+    function drawEyes(x, y, size, lookAngle) {
+        const ex = Math.cos(lookAngle || 0) * size * 0.15;
+        const ey = Math.sin(lookAngle || 0) * size * 0.15;
+        // White
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.ellipse(x - size * 0.22, y - size * 0.1, size * 0.18, size * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x + size * 0.22, y - size * 0.1, size * 0.18, size * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+        // Pupils
+        ctx.fillStyle = '#111';
+        ctx.beginPath(); ctx.arc(x - size * 0.22 + ex, y - size * 0.08 + ey, size * 0.09, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + size * 0.22 + ex, y - size * 0.08 + ey, size * 0.09, 0, Math.PI * 2); ctx.fill();
+        // Eye shine
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(x - size * 0.25 + ex, y - size * 0.14 + ey, size * 0.04, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + size * 0.19 + ex, y - size * 0.14 + ey, size * 0.04, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Helper: draw cute carbot body outline
+    function drawOutline(path) {
+        ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5; ctx.stroke(path);
+    }
 
     function drawUnit(unit) {
         const sp = worldToScreen(unit.x, unit.y);
         if (sp.x < -60 || sp.x > canvas.width + 60 || sp.y < -60 || sp.y > canvas.height + 60) return;
 
-        const img = spriteImages[unit.type];
-        const sz = unitSpriteSize[unit.type] || [32, 32];
-        const w = sz[0], h = sz[1];
+        const x = sp.x, y = sp.y;
+        const bounce = Math.sin(game.gameTime / 150 + unit.id * 0.7) * 2;
+        const S = 1; // scale
 
         ctx.save();
 
         // Cloak effect
         if (unit.cloaked && unit.isPlayer) {
-            ctx.globalAlpha = 0.45 + Math.sin(game.gameTime / 200) * 0.2;
+            ctx.globalAlpha = 0.35 + Math.sin(game.gameTime / 200) * 0.2;
         }
-
-        // Team color tint glow under unit
-        const teamColor = unit.isPlayer ? 'rgba(0,180,255,0.25)' : 'rgba(255,50,50,0.25)';
-        const glowR = Math.max(w, h) * 0.6;
-        const glow = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, glowR);
-        glow.addColorStop(0, teamColor);
-        glow.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = glow;
-        ctx.beginPath(); ctx.arc(sp.x, sp.y, glowR, 0, Math.PI * 2); ctx.fill();
 
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        ctx.beginPath(); ctx.ellipse(sp.x + 3, sp.y + h * 0.35, w * 0.4, h * 0.15, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath(); ctx.ellipse(x, y + 18, 14 * S, 5 * S, 0, 0, Math.PI * 2); ctx.fill();
 
-        // Draw sprite image
-        if (img && img.complete && img.naturalWidth > 0) {
-            // Crop center of the image (unit is centered in the source image)
-            const srcW = img.naturalWidth, srcH = img.naturalHeight;
-            const cropFactor = 0.55; // crop inner portion where the unit is
-            const sx = srcW * (1 - cropFactor) / 2;
-            const sy = srcH * (1 - cropFactor) / 2;
-            const sw = srcW * cropFactor;
-            const sh = srcH * cropFactor;
-            ctx.drawImage(img, sx, sy, sw, sh, sp.x - w / 2, sp.y - h / 2, w, h);
-        } else {
-            // Fallback colored circle
-            ctx.fillStyle = unitTypes[unit.type].color;
-            ctx.beginPath(); ctx.arc(sp.x, sp.y, w * 0.4, 0, Math.PI * 2); ctx.fill();
-            ctx.strokeStyle = unit.isPlayer ? '#00ff00' : '#ff4444'; ctx.lineWidth = 2; ctx.stroke();
-        }
+        const by = y + bounce;
 
-        // Carrying mineral indicator for probes
-        if (unit.carrying > 0) {
-            ctx.fillStyle = '#00ddff'; ctx.globalAlpha = 0.9;
-            ctx.beginPath(); ctx.arc(sp.x, sp.y + h * 0.35, 4, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
-        }
-
-        // Special effects per unit type
-        if (unit.type === 'archon') {
-            ctx.strokeStyle = '#ff00ff'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
-            ctx.beginPath(); ctx.ellipse(sp.x, sp.y, w * 0.55, h * 0.2, game.gameTime / 500, 0, Math.PI * 2); ctx.stroke();
-            ctx.globalAlpha = 1;
-        } else if (unit.type === 'zealot' && unit.attacking) {
-            // Psi blades glow when attacking
-            ctx.strokeStyle = '#00ccff'; ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.6 + Math.sin(game.gameTime / 80) * 0.4;
-            ctx.beginPath(); ctx.moveTo(sp.x - 14, sp.y + 6); ctx.lineTo(sp.x - 20, sp.y + 16); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(sp.x + 14, sp.y + 6); ctx.lineTo(sp.x + 20, sp.y + 16); ctx.stroke();
-            ctx.globalAlpha = 1;
+        if (unit.type === 'probe') {
+            // --- Carbot Probe: round gold body, big red eye, antenna ---
+            ctx.fillStyle = '#e8b830'; // gold body
+            const body = new Path2D(); body.arc(x, by, 12 * S, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Red center eye
+            ctx.fillStyle = '#cc2200';
+            ctx.beginPath(); ctx.arc(x, by, 5 * S, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#ff6644';
+            ctx.beginPath(); ctx.arc(x - 1, by - 1, 2, 0, Math.PI * 2); ctx.fill();
+            // Antenna
+            ctx.strokeStyle = '#c8a020'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x, by - 12); ctx.lineTo(x, by - 20); ctx.stroke();
+            ctx.fillStyle = '#ff3300';
+            ctx.beginPath(); ctx.arc(x, by - 20, 3, 0, Math.PI * 2); ctx.fill();
+            // Wings
+            ctx.fillStyle = '#d4a020';
+            ctx.beginPath(); ctx.ellipse(x - 14, by - 2, 6, 3, -0.4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(x + 14, by - 2, 6, 3, 0.4, 0, Math.PI * 2); ctx.fill();
+            // Carrying mineral
+            if (unit.carrying > 0) {
+                ctx.fillStyle = '#44ddff';
+                ctx.beginPath(); ctx.arc(x, by + 10, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#00aadd'; ctx.lineWidth = 1; ctx.stroke();
+            }
+        } else if (unit.type === 'zealot') {
+            // --- Carbot Zealot: gold body, big head, blue psi blades ---
+            // Legs
+            ctx.fillStyle = '#c89828';
+            ctx.fillRect(x - 8, by + 8, 5, 8);
+            ctx.fillRect(x + 3, by + 8, 5, 8);
+            // Body
+            ctx.fillStyle = '#e8b830';
+            const body = new Path2D();
+            body.ellipse(x, by, 14 * S, 16 * S, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Gold helmet/head crest
+            ctx.fillStyle = '#d4a020';
+            ctx.beginPath(); ctx.moveTo(x, by - 20); ctx.lineTo(x - 8, by - 10); ctx.lineTo(x + 8, by - 10); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 2; ctx.stroke();
+            // Eyes (angry)
+            ctx.fillStyle = '#00ccff';
+            ctx.beginPath(); ctx.ellipse(x - 5, by - 4, 4, 5, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(x + 5, by - 4, 4, 5, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#003366';
+            ctx.beginPath(); ctx.arc(x - 5, by - 3, 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 5, by - 3, 2, 0, Math.PI * 2); ctx.fill();
+            // Psi blades
+            const bladeAlpha = unit.attacking ? 0.9 : 0.6;
+            const bladeLen = unit.attacking ? 22 : 16;
+            ctx.globalAlpha = bladeAlpha;
+            ctx.strokeStyle = '#00ddff'; ctx.lineWidth = 3;
+            ctx.shadowColor = '#00ccff'; ctx.shadowBlur = 8;
+            ctx.beginPath(); ctx.moveTo(x - 14, by + 2); ctx.lineTo(x - 14 - bladeLen, by - 6); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x + 14, by + 2); ctx.lineTo(x + 14 + bladeLen, by - 6); ctx.stroke();
+            ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+        } else if (unit.type === 'dragoon') {
+            // --- Carbot Dragoon: round blue body on 4 stubby legs, glowing eye ---
+            // Legs
+            ctx.fillStyle = '#3a6a99';
+            [[-12, 10], [12, 10], [-10, -8], [10, -8]].forEach(([lx, ly]) => {
+                ctx.fillRect(x + lx - 3, by + ly, 6, 10);
+            });
+            // Body
+            ctx.fillStyle = '#4a90d9';
+            const body = new Path2D(); body.ellipse(x, by - 2, 16, 14, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Glowing eye/cannon
+            ctx.fillStyle = '#00ffff';
+            ctx.beginPath(); ctx.arc(x, by - 4, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#005588';
+            ctx.beginPath(); ctx.arc(x, by - 4, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#aaffff';
+            ctx.beginPath(); ctx.arc(x - 2, by - 6, 2, 0, Math.PI * 2); ctx.fill();
+        } else if (unit.type === 'archon') {
+            // --- Carbot Archon: big glowing blue-purple energy ball with cute face ---
+            const pulse = Math.sin(game.gameTime / 200) * 3;
+            // Glow
+            const grad = ctx.createRadialGradient(x, by, 4, x, by, 22 + pulse);
+            grad.addColorStop(0, '#ffaaff'); grad.addColorStop(0.4, '#cc44ff');
+            grad.addColorStop(0.8, '#6600cc'); grad.addColorStop(1, 'rgba(100,0,200,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, by, 24 + pulse, 0, Math.PI * 2); ctx.fill();
+            // Core body
+            ctx.fillStyle = '#dd88ff';
+            const body = new Path2D(); body.arc(x, by, 16, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            drawEyes(x, by, 30, unit.angle);
+            // Cute mouth
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(x, by + 6, 4, 0, Math.PI); ctx.stroke();
+        } else if (unit.type === 'darkTemplar') {
+            // --- Carbot DT: dark purple cloaked figure, glowing green warp blade ---
+            // Body
+            ctx.fillStyle = '#3a0066';
+            const body = new Path2D();
+            body.moveTo(x, by - 16); body.lineTo(x + 12, by + 4); body.lineTo(x + 8, by + 14);
+            body.lineTo(x - 8, by + 14); body.lineTo(x - 12, by + 4); body.closePath();
+            ctx.fill(body); drawOutline(body);
+            // Glowing eyes
+            ctx.fillStyle = '#00ff88'; ctx.shadowColor = '#00ff88'; ctx.shadowBlur = 6;
+            ctx.beginPath(); ctx.arc(x - 4, by - 4, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 4, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+            // Warp blade
+            ctx.strokeStyle = '#00ff44'; ctx.lineWidth = 3;
+            ctx.shadowColor = '#00ff44'; ctx.shadowBlur = 10;
+            ctx.beginPath(); ctx.moveTo(x + 12, by); ctx.lineTo(x + 26, by - 12); ctx.stroke();
+            ctx.shadowBlur = 0;
+        } else if (unit.type === 'carrier') {
+            // --- Carbot Carrier: big golden ship with cute cockpit ---
+            // Main hull
+            ctx.fillStyle = '#c8a030';
+            const body = new Path2D();
+            body.ellipse(x, by, 28, 14, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Top structure
+            ctx.fillStyle = '#e8c840';
+            ctx.beginPath();
+            ctx.moveTo(x - 12, by - 10); ctx.lineTo(x, by - 20); ctx.lineTo(x + 12, by - 10);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 2; ctx.stroke();
+            // Cockpit
+            ctx.fillStyle = '#00bbff';
+            ctx.beginPath(); ctx.ellipse(x, by - 2, 8, 6, 0, 0, Math.PI * 2); ctx.fill();
+            // Eyes in cockpit
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(x - 3, by - 3, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 3, by - 3, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(x - 3, by - 2, 1.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 3, by - 2, 1.5, 0, Math.PI * 2); ctx.fill();
+            // Engine glow
+            ctx.fillStyle = '#4488ff';
+            ctx.beginPath(); ctx.ellipse(x - 20, by + 4, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(x + 20, by + 4, 5, 3, 0, 0, Math.PI * 2); ctx.fill();
+        } else if (unit.type === 'zergling') {
+            // --- Carbot Zergling: tiny brown-orange blob with big mouth ---
+            ctx.fillStyle = '#cc7733';
+            const body = new Path2D(); body.ellipse(x, by, 10, 8, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Mouth (big open)
+            ctx.fillStyle = '#881100';
+            ctx.beginPath(); ctx.arc(x + 4, by + 2, 5, 0, Math.PI); ctx.fill();
+            // Teeth
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(x + 1, by + 2, 2, 2);
+            ctx.fillRect(x + 5, by + 2, 2, 2);
+            // Tiny eyes
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath(); ctx.arc(x - 2, by - 3, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 3, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(x - 2, by - 3, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 3, 1, 0, Math.PI * 2); ctx.fill();
+            // Claws
+            ctx.strokeStyle = '#aa5500'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x - 8, by + 4); ctx.lineTo(x - 14, by + 8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x + 8, by + 4); ctx.lineTo(x + 14, by + 8); ctx.stroke();
+        } else if (unit.type === 'hydralisk') {
+            // --- Carbot Hydra: snake-like body, hood, tiny arms ---
+            // Body/tail
+            ctx.fillStyle = '#5a7a2a';
+            ctx.beginPath(); ctx.ellipse(x, by + 6, 8, 10, 0, 0, Math.PI * 2); ctx.fill();
+            // Head/hood
+            ctx.fillStyle = '#6a8a3a';
+            const body = new Path2D();
+            body.ellipse(x, by - 6, 12, 14, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Hood spikes
+            ctx.fillStyle = '#4a6a1a';
+            ctx.beginPath(); ctx.moveTo(x - 12, by - 8); ctx.lineTo(x - 18, by - 18); ctx.lineTo(x - 6, by - 12); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x + 12, by - 8); ctx.lineTo(x + 18, by - 18); ctx.lineTo(x + 6, by - 12); ctx.closePath(); ctx.fill();
+            // Eyes
+            ctx.fillStyle = '#ff4400';
+            ctx.beginPath(); ctx.arc(x - 4, by - 8, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 8, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(x - 4, by - 7, 1.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 7, 1.5, 0, Math.PI * 2); ctx.fill();
+            // Tiny arms
+            ctx.strokeStyle = '#5a7a2a'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x - 10, by); ctx.lineTo(x - 16, by + 6); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x + 10, by); ctx.lineTo(x + 16, by + 6); ctx.stroke();
+        } else if (unit.type === 'mutalisk') {
+            // --- Carbot Muta: flying purple bat-thing with tiny body ---
+            // Wings
+            ctx.fillStyle = '#7722aa';
+            ctx.beginPath();
+            ctx.moveTo(x - 6, by - 2); ctx.lineTo(x - 24, by - 12); ctx.lineTo(x - 20, by + 4); ctx.lineTo(x - 6, by + 2);
+            ctx.closePath(); ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x + 6, by - 2); ctx.lineTo(x + 24, by - 12); ctx.lineTo(x + 20, by + 4); ctx.lineTo(x + 6, by + 2);
+            ctx.closePath(); ctx.fill();
+            // Body
+            ctx.fillStyle = '#9944cc';
+            const body = new Path2D(); body.ellipse(x, by, 10, 8, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Eyes
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath(); ctx.arc(x - 3, by - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 3, by - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(x - 3, by - 2, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 3, by - 2, 1, 0, Math.PI * 2); ctx.fill();
+            // Mouth
+            ctx.fillStyle = '#550088';
+            ctx.beginPath(); ctx.arc(x, by + 3, 3, 0, Math.PI); ctx.fill();
+        } else if (unit.type === 'ultralisk') {
+            // --- Carbot Ultra: massive brown beast, kaiser blades ---
+            // Body
+            ctx.fillStyle = '#7a5530';
+            const body = new Path2D(); body.ellipse(x, by, 22, 16, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Armor plates
+            ctx.fillStyle = '#5a3520';
+            ctx.beginPath(); ctx.ellipse(x, by - 8, 16, 6, 0, Math.PI, Math.PI * 2); ctx.fill();
+            // Kaiser blades
+            ctx.fillStyle = '#ddd'; ctx.strokeStyle = '#999'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x - 18, by - 8); ctx.lineTo(x - 30, by - 22); ctx.lineTo(x - 22, by - 6);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 18, by - 8); ctx.lineTo(x + 30, by - 22); ctx.lineTo(x + 22, by - 6);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Tiny angry eyes
+            ctx.fillStyle = '#ff2200';
+            ctx.beginPath(); ctx.arc(x - 6, by - 2, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 6, by - 2, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(x - 6, by - 1, 1.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 6, by - 1, 1.5, 0, Math.PI * 2); ctx.fill();
+            // Legs
+            ctx.fillStyle = '#5a3520';
+            [[-16, 12], [-8, 14], [8, 14], [16, 12]].forEach(([lx, ly]) => {
+                ctx.fillRect(x + lx - 3, by + ly - 2, 6, 8);
+            });
+        } else if (unit.type === 'guardian') {
+            // --- Carbot Guardian: fat flying zerg, droopy wings ---
+            ctx.fillStyle = '#8a6a14';
+            const body = new Path2D(); body.ellipse(x, by, 18, 10, 0, 0, Math.PI * 2);
+            ctx.fill(body); drawOutline(body);
+            // Wings
+            ctx.fillStyle = '#6a5010';
+            ctx.beginPath();
+            ctx.moveTo(x - 8, by - 6); ctx.lineTo(x - 22, by - 18); ctx.lineTo(x - 2, by - 4);
+            ctx.closePath(); ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x + 8, by - 6); ctx.lineTo(x + 22, by - 18); ctx.lineTo(x + 2, by - 4);
+            ctx.closePath(); ctx.fill();
+            // Face
+            ctx.fillStyle = '#ffaa00';
+            ctx.beginPath(); ctx.arc(x - 4, by - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(x - 4, by - 1, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 4, by - 1, 1, 0, Math.PI * 2); ctx.fill();
+            // Tail cannon
+            ctx.fillStyle = '#6a4a08';
+            ctx.beginPath(); ctx.moveTo(x + 16, by); ctx.lineTo(x + 26, by - 2); ctx.lineTo(x + 26, by + 2); ctx.closePath(); ctx.fill();
         }
 
         ctx.globalAlpha = 1;
         ctx.restore();
 
-        // Health bar
-        const barY = sp.y - h / 2 - 10;
-        const barW = Math.max(36, w);
-
-        // Shield bar (blue, on top)
+        // --- Health / Shield bars ---
+        const barY = y - 26;
+        const barW = 30;
         if (unit.maxShield > 0) {
             const shPct = unit.shield / unit.maxShield;
-            ctx.fillStyle = '#222'; ctx.fillRect(sp.x - barW / 2, barY - 4, barW, 3);
-            ctx.fillStyle = '#3399ff'; ctx.fillRect(sp.x - barW / 2, barY - 4, barW * shPct, 3);
+            ctx.fillStyle = '#222'; ctx.fillRect(x - barW / 2, barY - 4, barW, 3);
+            ctx.fillStyle = '#3399ff'; ctx.fillRect(x - barW / 2, barY - 4, barW * shPct, 3);
         }
-        // HP bar
         const hpPct = unit.hp / unit.maxHp;
-        ctx.fillStyle = '#222'; ctx.fillRect(sp.x - barW / 2, barY, barW, 4);
-        ctx.fillStyle = hpPct > 0.5 ? '#00ff00' : hpPct > 0.25 ? '#ffff00' : '#ff0000';
-        ctx.fillRect(sp.x - barW / 2, barY, barW * hpPct, 4);
+        ctx.fillStyle = '#222'; ctx.fillRect(x - barW / 2, barY, barW, 4);
+        ctx.fillStyle = hpPct > 0.6 ? '#44dd44' : hpPct > 0.3 ? '#dddd44' : '#dd4444';
+        ctx.fillRect(x - barW / 2, barY, barW * hpPct, 4);
 
-        // Selection circle
+        // Selection
         if (game.selectedUnits.includes(unit)) {
-            ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.arc(sp.x, sp.y, Math.max(w, h) * 0.6, 0, Math.PI * 2); ctx.stroke();
-
+            ctx.strokeStyle = '#44ff44'; ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.stroke();
+            ctx.setLineDash([]);
             if (unit.carrying > 0) {
-                ctx.fillStyle = '#00ddff'; ctx.font = '10px Arial';
-                ctx.fillText(unit.carrying, sp.x + w / 2 + 4, sp.y - h / 2);
+                ctx.fillStyle = '#44ddff'; ctx.font = 'bold 10px Arial';
+                ctx.fillText(unit.carrying, x + 16, y - 18);
             }
         }
-
-        // Attack move indicator
         if (unit.state === 'attackMove' && unit.isPlayer) {
             ctx.strokeStyle = '#ff8800'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.arc(sp.x, sp.y, Math.max(w, h) * 0.65, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI * 2); ctx.stroke();
         }
     }
 
@@ -751,140 +976,231 @@
         const sp = worldToScreen(b.x, b.y);
         if (sp.x < -100 || sp.x > canvas.width + 100 || sp.y < -100 || sp.y > canvas.height + 100) return;
 
-        const img = spriteImages[b.type];
+        const x = sp.x, y = sp.y;
         const isLarge = (b.type === 'nexus' || b.type === 'hatchery');
-        const bSize = isLarge ? 100 : 56;
 
         ctx.save();
 
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        ctx.beginPath(); ctx.ellipse(sp.x + 4, sp.y + bSize * 0.35, bSize * 0.45, bSize * 0.15, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath(); ctx.ellipse(x + 3, y + (isLarge ? 40 : 22), isLarge ? 45 : 24, isLarge ? 12 : 7, 0, 0, Math.PI * 2); ctx.fill();
 
-        // Team color base glow
-        if (b.type !== 'pylon') {
-            const teamColor = b.isPlayer ? 'rgba(0,120,255,0.2)' : 'rgba(200,50,20,0.2)';
-            const gr = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, bSize * 0.6);
-            gr.addColorStop(0, teamColor); gr.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = gr;
-            ctx.beginPath(); ctx.arc(sp.x, sp.y, bSize * 0.6, 0, Math.PI * 2); ctx.fill();
-        }
-
-        if (img && img.complete && img.naturalWidth > 0) {
-            const srcW = img.naturalWidth, srcH = img.naturalHeight;
-            // Crop to center where the building actually is
-            const cropFactor = b.type === 'pylon' ? 0.5 : 0.7;
-            const sx = srcW * (1 - cropFactor) / 2;
-            const sy = srcH * (1 - cropFactor) / 2;
-            const sw = srcW * cropFactor;
-            const sh = srcH * cropFactor;
-            const drawH = bSize * (sh / sw); // maintain aspect ratio
-            ctx.drawImage(img, sx, sy, sw, sh, sp.x - bSize / 2, sp.y - drawH / 2, bSize, drawH);
-        } else {
-            // Fallback shapes
-            if (b.type === 'nexus') {
-                ctx.fillStyle = '#0077bb'; ctx.strokeStyle = '#005599'; ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(sp.x, sp.y - 40); ctx.lineTo(sp.x + 35, sp.y - 20);
-                ctx.lineTo(sp.x + 35, sp.y + 20); ctx.lineTo(sp.x, sp.y + 40);
-                ctx.lineTo(sp.x - 35, sp.y + 20); ctx.lineTo(sp.x - 35, sp.y - 20);
-                ctx.closePath(); ctx.fill(); ctx.stroke();
-            } else if (b.type === 'hatchery') {
-                ctx.fillStyle = '#6B3410'; ctx.strokeStyle = '#4A2008'; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.arc(sp.x, sp.y, 45, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-            } else if (b.type === 'pylon') {
-                ctx.fillStyle = '#009955'; ctx.strokeStyle = '#006633'; ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(sp.x, sp.y - 22); ctx.lineTo(sp.x + 14, sp.y - 8);
-                ctx.lineTo(sp.x + 14, sp.y + 12); ctx.lineTo(sp.x, sp.y + 22);
-                ctx.lineTo(sp.x - 14, sp.y + 12); ctx.lineTo(sp.x - 14, sp.y - 8);
-                ctx.closePath(); ctx.fill(); ctx.stroke();
-            }
-        }
-
-        // Pylon energy field effect
-        if (b.type === 'pylon') {
-            const grad = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, 35);
-            grad.addColorStop(0, 'rgba(0,255,170,0.15)'); grad.addColorStop(1, 'rgba(0,255,170,0)');
+        if (b.type === 'nexus') {
+            // --- Carbot Nexus: big golden pyramid-ish building, blue crystal top ---
+            // Base
+            ctx.fillStyle = '#c8a030';
+            ctx.beginPath();
+            ctx.moveTo(x - 45, y + 30); ctx.lineTo(x - 35, y - 15); ctx.lineTo(x + 35, y - 15); ctx.lineTo(x + 45, y + 30);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5; ctx.stroke();
+            // Mid section
+            ctx.fillStyle = '#ddb840';
+            ctx.beginPath();
+            ctx.moveTo(x - 30, y - 10); ctx.lineTo(x - 18, y - 30); ctx.lineTo(x + 18, y - 30); ctx.lineTo(x + 30, y - 10);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 2; ctx.stroke();
+            // Crystal top
+            ctx.fillStyle = '#44ccff';
+            ctx.beginPath();
+            ctx.moveTo(x, y - 48); ctx.lineTo(x - 10, y - 28); ctx.lineTo(x + 10, y - 28);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#0088cc'; ctx.lineWidth = 2; ctx.stroke();
+            // Glow
+            const grad = ctx.createRadialGradient(x, y - 38, 0, x, y - 38, 18);
+            grad.addColorStop(0, 'rgba(68,204,255,0.4)'); grad.addColorStop(1, 'rgba(68,204,255,0)');
             ctx.fillStyle = grad;
-            ctx.beginPath(); ctx.arc(sp.x, sp.y, 35, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y - 38, 18, 0, Math.PI * 2); ctx.fill();
+            // Door
+            ctx.fillStyle = '#006699';
+            ctx.beginPath(); ctx.ellipse(x, y + 14, 12, 16, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#00aadd';
+            ctx.beginPath(); ctx.ellipse(x, y + 14, 7, 10, 0, 0, Math.PI * 2); ctx.fill();
+            // Side pylons
+            ctx.fillStyle = '#b89028';
+            ctx.fillRect(x - 42, y + 8, 8, 22); ctx.fillRect(x + 34, y + 8, 8, 22);
+            ctx.fillStyle = '#00ccff';
+            ctx.beginPath(); ctx.arc(x - 38, y + 8, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 38, y + 8, 4, 0, Math.PI * 2); ctx.fill();
+        } else if (b.type === 'hatchery') {
+            // --- Carbot Hatchery: big brown organic blob with eyes and teeth ---
+            // Creep
+            ctx.fillStyle = '#5a2808';
+            ctx.beginPath(); ctx.ellipse(x, y + 20, 50, 14, 0, 0, Math.PI * 2); ctx.fill();
+            // Body
+            ctx.fillStyle = '#8B5513';
+            const body = new Path2D(); body.ellipse(x, y, 40, 32, 0, 0, Math.PI * 2);
+            ctx.fill(body);
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 3; ctx.stroke(body);
+            // Inner organic pattern
+            ctx.fillStyle = '#7a4510';
+            ctx.beginPath(); ctx.ellipse(x - 10, y - 6, 14, 10, -0.3, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(x + 12, y + 4, 12, 8, 0.3, 0, Math.PI * 2); ctx.fill();
+            // Big mouth
+            ctx.fillStyle = '#cc3300';
+            ctx.beginPath(); ctx.ellipse(x, y + 10, 16, 10, 0, 0, Math.PI); ctx.fill();
+            // Teeth
+            ctx.fillStyle = '#ffeedd';
+            for (let i = -3; i <= 3; i++) {
+                ctx.beginPath(); ctx.moveTo(x + i * 4, y + 10); ctx.lineTo(x + i * 4 - 2, y + 16); ctx.lineTo(x + i * 4 + 2, y + 16); ctx.closePath(); ctx.fill();
+            }
+            // Eyes
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath(); ctx.arc(x - 14, y - 10, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 14, y - 10, 7, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#ff2200';
+            ctx.beginPath(); ctx.arc(x - 14, y - 9, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + 14, y - 9, 3.5, 0, Math.PI * 2); ctx.fill();
+            // Tentacles
+            ctx.strokeStyle = '#7a4510'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+            for (let i = 0; i < 5; i++) {
+                const a = i * Math.PI * 2 / 5 + Math.sin(game.gameTime / 600 + i) * 0.3;
+                ctx.beginPath();
+                ctx.moveTo(x + Math.cos(a) * 34, y + Math.sin(a) * 26);
+                ctx.lineTo(x + Math.cos(a) * 50, y + Math.sin(a) * 38);
+                ctx.stroke();
+            }
+            ctx.lineCap = 'butt';
+        } else if (b.type === 'pylon') {
+            // --- Carbot Pylon: cute teardrop crystal, green glow ---
+            // Glow
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, 32);
+            grad.addColorStop(0, 'rgba(0,255,150,0.2)'); grad.addColorStop(1, 'rgba(0,255,150,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, y, 32, 0, Math.PI * 2); ctx.fill();
+            // Crystal body
+            ctx.fillStyle = '#22aa66';
+            ctx.beginPath();
+            ctx.moveTo(x, y - 24); ctx.quadraticCurveTo(x + 16, y - 8, x + 14, y + 10);
+            ctx.lineTo(x, y + 20); ctx.lineTo(x - 14, y + 10);
+            ctx.quadraticCurveTo(x - 16, y - 8, x, y - 24);
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 2; ctx.stroke();
+            // Inner glow
+            ctx.fillStyle = '#44ffaa';
+            ctx.beginPath(); ctx.ellipse(x, y, 6, 8, 0, 0, Math.PI * 2); ctx.fill();
+            // Highlight
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath(); ctx.ellipse(x - 4, y - 10, 4, 7, -0.3, 0, Math.PI * 2); ctx.fill();
         }
 
         ctx.restore();
 
         // Health bar
         const hpPct = b.hp / b.maxHp;
-        const bw = isLarge ? 80 : 44;
-        const barTop = sp.y - (isLarge ? 55 : 35);
-        ctx.fillStyle = '#222'; ctx.fillRect(sp.x - bw / 2, barTop, bw, 5);
-        ctx.fillStyle = hpPct > 0.5 ? '#00ff00' : '#ff0000';
-        ctx.fillRect(sp.x - bw / 2, barTop, bw * hpPct, 5);
-
+        const bw = isLarge ? 70 : 36;
+        const barTop = y - (isLarge ? 55 : 30);
+        ctx.fillStyle = '#222'; ctx.fillRect(x - bw / 2, barTop, bw, 5);
+        ctx.fillStyle = hpPct > 0.5 ? '#44dd44' : '#dd4444';
+        ctx.fillRect(x - bw / 2, barTop, bw * hpPct, 5);
         if (b.maxShield > 0) {
             const shPct = b.shield / b.maxShield;
-            ctx.fillStyle = '#222'; ctx.fillRect(sp.x - bw / 2, barTop - 5, bw, 3);
-            ctx.fillStyle = '#3399ff'; ctx.fillRect(sp.x - bw / 2, barTop - 5, bw * shPct, 3);
+            ctx.fillStyle = '#222'; ctx.fillRect(x - bw / 2, barTop - 5, bw, 3);
+            ctx.fillStyle = '#3399ff'; ctx.fillRect(x - bw / 2, barTop - 5, bw * shPct, 3);
         }
     }
 
     function drawMineral(m) {
         const sp = worldToScreen(m.x, m.y);
-        if (sp.x < -30 || sp.x > canvas.width + 30 || sp.y < -30 || sp.y > canvas.height + 30) return;
+        if (sp.x < -40 || sp.x > canvas.width + 40 || sp.y < -40 || sp.y > canvas.height + 40) return;
 
-        const alpha = m.amount > 0 ? 1 : 0.3;
-        ctx.globalAlpha = alpha;
+        const x = sp.x, y = sp.y;
+        ctx.globalAlpha = m.amount > 0 ? 1 : 0.3;
 
-        // Crystal shape
-        ctx.fillStyle = '#00bbee'; ctx.strokeStyle = '#0088aa'; ctx.lineWidth = 2;
+        // --- Carbot Mineral: big chunky blue crystal cluster ---
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.beginPath(); ctx.ellipse(x + 2, y + 18, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Big crystal
+        ctx.fillStyle = '#33ccff';
         ctx.beginPath();
-        ctx.moveTo(sp.x, sp.y - 18); ctx.lineTo(sp.x + 10, sp.y - 8);
-        ctx.lineTo(sp.x + 14, sp.y + 6); ctx.lineTo(sp.x + 4, sp.y + 14);
-        ctx.lineTo(sp.x - 4, sp.y + 14); ctx.lineTo(sp.x - 14, sp.y + 6);
-        ctx.lineTo(sp.x - 10, sp.y - 8);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.moveTo(x - 2, y - 24); ctx.lineTo(x + 8, y - 8); ctx.lineTo(x + 6, y + 12);
+        ctx.lineTo(x - 8, y + 12); ctx.lineTo(x - 10, y - 6);
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#0088bb'; ctx.lineWidth = 2; ctx.stroke();
 
-        // Highlight
+        // Medium crystal
+        ctx.fillStyle = '#55ddff';
+        ctx.beginPath();
+        ctx.moveTo(x + 8, y - 16); ctx.lineTo(x + 16, y - 4); ctx.lineTo(x + 12, y + 10);
+        ctx.lineTo(x + 4, y + 8);
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#0088bb'; ctx.lineWidth = 1.5; ctx.stroke();
+
+        // Small crystal
         ctx.fillStyle = '#88eeff';
         ctx.beginPath();
-        ctx.moveTo(sp.x - 4, sp.y - 12); ctx.lineTo(sp.x + 2, sp.y - 16);
-        ctx.lineTo(sp.x + 6, sp.y - 6); ctx.lineTo(sp.x, sp.y - 4);
+        ctx.moveTo(x - 10, y - 14); ctx.lineTo(x - 4, y - 6); ctx.lineTo(x - 6, y + 4);
+        ctx.lineTo(x - 14, y + 2);
         ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = '#0088bb'; ctx.lineWidth = 1.5; ctx.stroke();
 
-        // Amount text
-        ctx.fillStyle = '#88ddff'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
-        ctx.fillText(m.amount, sp.x, sp.y + 26);
+        // Sparkle highlight
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath(); ctx.arc(x, y - 18, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + 12, y - 10, 1.5, 0, Math.PI * 2); ctx.fill();
+
+        // Amount
+        ctx.fillStyle = '#aaeeff'; ctx.font = 'bold 10px Arial'; ctx.textAlign = 'center';
+        ctx.fillText(m.amount, x, y + 28);
         ctx.textAlign = 'left';
 
         ctx.globalAlpha = 1;
     }
 
-    // === TERRAIN ===
+    // === TERRAIN (Carbot style - colorful, grassy) ===
     function drawTerrain() {
-        ctx.fillStyle = '#141428'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Green-brown gradient base (like Carbot maps)
+        const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        grad.addColorStop(0, '#4a7a3a'); grad.addColorStop(0.5, '#3a6a2a'); grad.addColorStop(1, '#5a8a4a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Grid
-        ctx.strokeStyle = '#1e1e38'; ctx.lineWidth = 1;
-        const startX = -(game.camera.x % 60);
-        const startY = -(game.camera.y % 60);
-        for (let x = startX; x < canvas.width; x += 60) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-        }
-        for (let y = startY; y < canvas.height; y += 60) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-        }
-
-        // Random terrain details (rocks etc) - seeded by position
-        ctx.fillStyle = '#1a1a30';
-        for (let rx = 0; rx < MAP_W; rx += 400) {
-            for (let ry = 0; ry < MAP_H; ry += 400) {
-                const sp = worldToScreen(rx + 200, ry + 200);
-                if (sp.x > -100 && sp.x < canvas.width + 100 && sp.y > -100 && sp.y < canvas.height + 100) {
+        // Terrain patches (dirt/grass variation)
+        for (let rx = 0; rx < MAP_W; rx += 200) {
+            for (let ry = 0; ry < MAP_H; ry += 200) {
+                const sp = worldToScreen(rx + 100, ry + 100);
+                if (sp.x > -120 && sp.x < canvas.width + 120 && sp.y > -120 && sp.y < canvas.height + 120) {
                     const seed = (rx * 7 + ry * 13) % 100;
-                    if (seed < 20) {
-                        ctx.beginPath(); ctx.arc(sp.x, sp.y, 15 + seed % 10, 0, Math.PI * 2); ctx.fill();
+                    // Dirt patches
+                    if (seed < 15) {
+                        ctx.fillStyle = 'rgba(140,110,60,0.3)';
+                        ctx.beginPath(); ctx.ellipse(sp.x, sp.y, 40 + seed, 30 + seed * 0.5, seed * 0.1, 0, Math.PI * 2); ctx.fill();
+                    }
+                    // Dark grass
+                    if (seed > 60 && seed < 80) {
+                        ctx.fillStyle = 'rgba(30,80,20,0.25)';
+                        ctx.beginPath(); ctx.ellipse(sp.x, sp.y, 50, 35, 0, 0, Math.PI * 2); ctx.fill();
+                    }
+                    // Small rocks
+                    if (seed > 85) {
+                        ctx.fillStyle = '#6a7a5a';
+                        ctx.beginPath(); ctx.arc(sp.x, sp.y, 6 + seed % 8, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = '#556a46'; ctx.lineWidth = 1.5; ctx.stroke();
+                    }
+                    // Tiny grass tufts
+                    if (seed % 5 === 0) {
+                        ctx.strokeStyle = '#2a5a1a'; ctx.lineWidth = 1.5;
+                        for (let g = 0; g < 3; g++) {
+                            const gx = sp.x + (g - 1) * 6;
+                            ctx.beginPath(); ctx.moveTo(gx, sp.y + 4); ctx.lineTo(gx + (g - 1) * 2, sp.y - 6); ctx.stroke();
+                        }
                     }
                 }
             }
+        }
+
+        // Map border darkening
+        const camX = game.camera.x, camY = game.camera.y;
+        // Left edge
+        if (camX < 100) {
+            ctx.fillStyle = `rgba(40,30,20,${(100 - camX) / 200})`;
+            ctx.fillRect(0, 0, 60, canvas.height);
+        }
+        // Top edge
+        if (camY < 100) {
+            ctx.fillStyle = `rgba(40,30,20,${(100 - camY) / 200})`;
+            ctx.fillRect(0, 0, canvas.width, 60);
         }
     }
 
@@ -1516,11 +1832,6 @@
             const u = game.selectedUnits[0];
             document.getElementById('selectedUnitName').textContent =
                 `${u.name} ${game.selectedUnits.length > 1 ? `(${game.selectedUnits.length}개)` : ''}`;
-            const portrait = document.getElementById('selectedUnitPortrait');
-            if (spriteList[u.type]) {
-                portrait.src = spriteList[u.type];
-                portrait.style.display = 'block';
-            } else { portrait.style.display = 'none'; }
             const hpPct = (u.hp / u.maxHp) * 100;
             const hpBar = document.getElementById('selectedUnitHealth');
             hpBar.style.width = `${hpPct}%`;
