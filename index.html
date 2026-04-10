@@ -221,6 +221,7 @@
     <div id="timeUpOverlay">
         <h2>⏰ 오늘의 플레이 시간 종료!</h2>
         <p>희망누리 6학년 3반 여러분,<br>오늘 30분 플레이 시간이 모두 끝났습니다.<br>내일 다시 만나요! 😊</p>
+        <p id="teacherHint" style="font-size:.7rem;color:#555;margin-top:8px;cursor:default" onclick="teacherReset(this)">⑤</p>
     </div>
     <div id="inGameTimer">⏱ <span id="inGameTimerVal">30분 00초</span></div>
     <div id="startScreen">
@@ -2314,6 +2315,15 @@
         if (document.hidden) TimeGuard._flush();
         else if (TimeGuard._start) TimeGuard._start = Date.now();
     });
+    let _teacherClicks=0,_teacherTimer=0;
+    function teacherReset(el){
+      clearTimeout(_teacherTimer);
+      _teacherClicks++;
+      if(_teacherClicks>=5){
+        localStorage.removeItem('hn_playtime');localStorage.removeItem('hn_date');
+        _teacherClicks=0;alert('초기화 완료!');location.reload();
+      } else { _teacherTimer=setTimeout(()=>{_teacherClicks=0;el.textContent='⑤';},2000); }
+    }
     window.addEventListener('load', () => TimeGuard.initUI());
 
     // === START ===
